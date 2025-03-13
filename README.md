@@ -6,9 +6,9 @@ EasyPrep is a meal prepping application designed to simplify the process of sele
 
 ## Technologies Used
 - **Frontend**: React
-- **Backend**: Firebase (Firestore for database and Firebase Authentication for user management)
+- **Backend**: Node.js,Firebase (Firestore for database and Firebase Authentication for user management)
 - **Version Control**: Git
-- **Containerization**: Docker (optional)
+- **Containerization**: Docker
 
 ## Key Features
 - **User Authentication**: Users can sign up, log in, and manage their profiles using Firebase Authentication.
