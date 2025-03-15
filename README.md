@@ -15,7 +15,7 @@ EasyPrep is a meal prepping application designed to simplify the process of sele
 - **Meal Categories**: Browse meal categories (e.g., vegan, vegetarian, chicken, classic, avoid gluten etc.).
 - **Customizable Orders**: Choose quantities and additional options for each box meal such as side dishes(e.g., rice, salad, vegetables), sauces(e.g., BBQ sauce, garlic sauce).
 - **Shopping Cart**: Add meals to the cart, adjust quantities, and proceed to checkout.
-- **Payment Integration**: Secure payment processing (integrate third-party services like Stripe).
+- **Payment Integration**: Payment processing.
 - **Nutritional Information**: Display nutritional details (calories, protein, carbs, etc.) for each meal.
 - **Order History**: Users can view their past orders and easily reorder meals.
 - **Admin Dashboard**: Admins can manage meals, user accounts, and order details using Firebase Firestore.
