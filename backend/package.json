@@ -1,0 +1,16 @@
+{
+  "name": "boxprep_backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Meal Prep Application ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cedric Mapilisan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase-admin": "^13.2.0"
+  }
+}
