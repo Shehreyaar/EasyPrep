@@ -56,7 +56,7 @@ function Profile() {
               <p>Date: March 15, 2024</p>
               <p>Items: 2x Vegan Box, 1x Family Pack</p>
             </div>
-            <button className="edit-btn">View All Orders</button>
+            <Link to="/track-order" className="edit-btn">Track Order</Link>            
           </div>
 
           <div className="profile-section">
@@ -69,9 +69,8 @@ function Profile() {
 
           <div className="profile-section">
             <h3>Security & Settings</h3>
-            <p>Change Password</p>
-            <p>Notification Preferences</p>
-            <button className="edit-btn">Update Settings</button>
+            <p>Change Password</p>            
+            <Link to="/settings" className="edit-btn">Update Settings</Link>            
           </div>
         </div>
       </div>

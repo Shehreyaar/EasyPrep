@@ -1,6 +1,6 @@
-import React, { useState } from "react"
-import "../css/styles.css"
-import { Link } from "react-router-dom"
+import React, { useState } from "react";
+import "../css/styles.css";
+import { Link } from "react-router-dom";
 
 function EditProfile() {
   const [fullName, setFullName] = useState("John Doe");

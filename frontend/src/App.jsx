@@ -13,6 +13,7 @@ import EditProfile from './pages/EditProfile'
 import Cart from './pages/Cart'
 import SpecialOffers from './pages/SpecialOffers'
 import TrackOrder from './pages/TrackOrder'
+import Settings from './pages/Settings'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/special-offers" element={<SpecialOffers />} />
         <Route path="/track-order" element={<TrackOrder />} />
+        <Route path="/settings" element={<Settings />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />     
