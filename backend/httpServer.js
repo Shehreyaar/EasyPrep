@@ -4,6 +4,7 @@ const app = expressObj();
 
 app.use(expressObj.json());
 
+//test data, will probably store them in firebase later on?
 const mealList = [
     {id: 0, name: 'Beef and Brock', price: 20.99},
     {id: 1, name: 'Quinoa Salad', price: 13.99},
@@ -11,6 +12,7 @@ const mealList = [
     {id: 3, name: 'Vegan Burger', price: 16.99},
     {id: 4, name: 'Chicken Tenders', price: 17.99},
 ];
+
 let cart = [];
 let mealCounter = 0;
 
