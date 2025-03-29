@@ -1,42 +1,15 @@
-import React, { useState } from "react";
+// src/pages/Cart.jsx
+
+import React, { useContext } from "react";
 import "../css/styles.css";
 import "../css/cartStyle.css";
+import { CartContext } from "../services/CartContext";
+import { Link } from "react-router-dom";
 
 function Cart() {
-  const [cart, setCart] = useState([
-    {
-      category: "Mediterranean",
-      items: [
-        {
-          name: "Shawarma",
-          ingredients: ["Chicken", "Lettuce", "Garlic Sauce", "Spicy", "Hot Peppers"],
-          quantity: 10,
-        },
-        {
-          name: "Shawarma Platter",
-          ingredients: ["Greek Salad", "Chicken", "Beef", "Garlic Sauce", "Cheese"],
-          quantity: 5,
-        },
-      ],
-    },
-    {
-      category: "Italian",
-      items: [
-        {
-          name: "Margherita Pizza",
-          ingredients: ["Extra Cheese", "Marinara Sauce", "Mozzarella Cheese"],
-          quantity: 5,
-        },
-      ],
-    },
-  ]);
-
-  const updateQuantity = (catIndex, itemIndex, delta) => {
-    const updated = [...cart];
-    const item = updated[catIndex].items[itemIndex];
-    item.quantity = Math.max(0, item.quantity + delta);
-    setCart(updated);
-  };
+  const { cart, updateQuantity } = useContext(CartContext);
+  
+  console.log("Current cart:", cart);
 
   return (
     <>
@@ -48,48 +21,64 @@ function Cart() {
           <img src="/Images/nameApp.png" alt="NameApp" className="name" />
         </div>
         <nav className="nav-menu">
-          <a href="/home-logged-in">Home</a>
-          <a href="/search">Search Menu</a>
-          <a href="/meal-detail">Nutrition Facts</a>
-          <a href="/special-offers">Special Offers</a>
-          <a href="/track-order">Track Order</a>
-          <a href="/cart">MyCart</a>
-          <a href="/">Logout</a>
+          <Link to="/home-logged-in">Home</Link>
+          <Link to="/search">Search Menu</Link>
+          <Link to="/meal-detail">Nutrition Facts</Link>
+          <Link to="/special-offers">Special Offers</Link>
+          <Link to="/track-order">Track Order</Link>
+          <Link to="/cart">MyCart</Link>
+          <Link to="/">Logout</Link>
         </nav>
-        
-        <button className="login-btn" onClick={() => (window.location.href = "/profile")}>
+        <button
+          className="login-btn"
+          onClick={() => (window.location.href = "/profile")}
+        >
           <img src="/Images/account.svg" alt="User" className="user-icon" />
           MyAccount
         </button>
       </header>
 
       <section className="cart-container">
-      <h2 className="section-title">Your Cart</h2>       
-
-        {cart.map((section, catIndex) => (
-          <div key={catIndex} className="cart-item">
-            <h2>{section.category}</h2>
-
-            {section.items.map((item, itemIndex) => (
-              <div key={itemIndex} className="order-item">
-                <p className="meal-name">{item.name}</p>
-                <ul className="ingredients">
-                  {item.ingredients.map((ing, i) => (
-                    <li key={i}>{ing}</li>
-                  ))}
-                </ul>
-                <div className="quantity-control">
-                  <button className="decrease" onClick={() => updateQuantity(catIndex, itemIndex, -1)}>-</button>
-                  <span className="quantity">{item.quantity}</span>
-                  <button className="increase" onClick={() => updateQuantity(catIndex, itemIndex, +1)}>+</button>
+        <h2 className="section-title">Your Cart</h2>
+        {cart.length === 0 ? (
+          <p>No items in cart.</p>
+        ) : (
+          cart.map((section, catIndex) => (
+            <div key={catIndex} className="cart-item">
+              <h2>{section.category}</h2>
+              {section.items.map((item, itemIndex) => (
+                <div key={itemIndex} className="order-item">
+                  <p className="meal-name">{item.name}</p>
+                  <ul className="ingredients">
+                    {item.ingredients.map((ing, i) => (
+                      <li key={i}>{ing}</li>
+                    ))}
+                  </ul>
+                  <div className="quantity-control">
+                    <button
+                      className="decrease"
+                      onClick={() => updateQuantity(catIndex, itemIndex, -1)}
+                    >
+                      -
+                    </button>
+                    <span className="quantity">{item.quantity}</span>
+                    <button
+                      className="increase"
+                      onClick={() => updateQuantity(catIndex, itemIndex, +1)}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
-       
+              ))}
+            </div>
+          ))
+        )}
 
-        <button className="checkout-btn" onClick={() => alert("Proceeding to checkout...")}>
+        <button
+          className="checkout-btn"
+          onClick={() => alert("Proceeding to checkout...")}
+        >
           Proceed to Checkout
         </button>
       </section>
