@@ -51,8 +51,8 @@ function Cart() {
           <a href="/home-logged-in">Home</a>
           <a href="/search">Search Menu</a>
           <a href="/meal-detail">Nutrition Facts</a>
-          <a href="#">BoxMeals</a>
-          <a href="#">Track Order</a>
+          <a href="/special-offers">Special Offers</a>
+          <a href="/track-order">Track Order</a>
           <a href="/cart">MyCart</a>
           <a href="/">Logout</a>
         </nav>

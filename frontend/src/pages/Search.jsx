@@ -62,8 +62,8 @@ function Search() {
           <li><a href="/home-logged-in">Home</a></li>
           <li><a href="/search">Search Menu</a></li>
           <li><a href="/meal-detail">Nutrition Facts</a></li>
-          <li><a href="#">Box Meals</a></li>
-          <li><a href="#">Track Order</a></li>
+          <li><a href="/special-offers">Special Offers</a></li>
+          <li><a href="/track-order">Track Order</a></li>
           <li><a href="/cart">MyCart</a></li>
           <li><a href="/">Logout</a></li>
           

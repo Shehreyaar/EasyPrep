@@ -11,6 +11,8 @@ import MealDetail from './pages/MealDetail'
 import ManageAddresses from './pages/ManageAddresses'
 import EditProfile from './pages/EditProfile'
 import Cart from './pages/Cart'
+import SpecialOffers from './pages/SpecialOffers'
+import TrackOrder from './pages/TrackOrder'
 
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
         <Route path="/manage-addresses" element={<ManageAddresses />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/special-offers" element={<SpecialOffers />} />
+        <Route path="/track-order" element={<TrackOrder />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />     

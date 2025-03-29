@@ -17,9 +17,9 @@ function HomeLoggedIn() {
           <Link to="/home-logged-in">Home</Link>
           <Link to="/search">Search Menu</Link>
           <Link to="/meal-detail">Nutrition Facts</Link>
-          <Link to="#">BoxMeals</Link>
-          <Link to="#">Track Order</Link>
-          <Link to="/cart">MyCart</Link>
+          <Link to="/special-offers">Special Offers</Link>
+          <Link to="/track-order">Track Order</Link>
+          <Link to="/cart">My Cart</Link>
           <Link to="/">Logout</Link>
         </nav>
 

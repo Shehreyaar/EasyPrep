@@ -19,7 +19,7 @@ function Home() {
           <Link to="/">Home</Link>
           <Link to="/login">Search Menu</Link>
           <Link to="/login">Nutrition Facts</Link>
-          <Link to="/login">BoxMeals</Link>
+          <Link to="/login">Special Offers</Link>
           <Link to="/login">Track Order</Link>
         </nav>
 

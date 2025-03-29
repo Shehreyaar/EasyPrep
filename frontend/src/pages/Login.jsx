@@ -31,7 +31,7 @@ function Login() {
           <Link to="/home-logged-in">Home</Link>
           <Link to="/search">Search Menu</Link>
           <Link to="#">Special Offers</Link>
-          <Link to="#">BoxMeals</Link>
+          <Link to="#">Nutrition Facts</Link>
           <Link to="#">Track Order</Link>
         </nav>
         <button className="login-btn">
