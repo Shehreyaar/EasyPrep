@@ -4,17 +4,8 @@ const app = expressObj();
 
 app.use(expressObj.json());
 
-//test data, will probably store them in firebase later on?
-const mealList = [
-    {id: 0, name: 'Beef and Brock', price: 20.99},
-    {id: 1, name: 'Quinoa Salad', price: 13.99},
-    {id: 2, name: 'Rice and Salmon', price: 21.99},
-    {id: 3, name: 'Vegan Burger', price: 16.99},
-    {id: 4, name: 'Chicken Tenders', price: 17.99},
-];
-
 let cart = [];
-let mealCounter = 0;
+let wallet = 1000.00; //default wallet balance 
 
 function getIdx (mealId) {
     for (let i = 0; i < mealList.length; i++) {
@@ -36,6 +27,27 @@ app.post('/cart', function (req, res) {
 
     cart.push({meal, quantity});
     res.status(200).send('Meal added successfully');
+});
+
+//Checkout 
+app.post('/checkout', function (req, res) {
+    if (cart.length === 0 ) {
+        return res.status(400).send('Cart is empty');
+    } 
+
+    let total = 0;
+    for (let item of cart) {
+        total += item.meal.price * item.quantity; //calculate the total price 
+    }
+
+    if (wallet < total) {
+        return res.status(403).send('Insufficient funds');
+    }
+
+    wallet -= total;
+    cart = []; //clear the cart after successful checkout
+
+    res.status(200).send('Checkout successful. Your remaining balance is: ' + wallet);
 });
 
 //View cart
