@@ -1,112 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { db } from "../firebase.js"; 
+import { collection, getDocs } from "firebase/firestore";
 import "../css/stylesSearch.css";
 
 function Search() {
+  // state to hold search input, meal category and list of meals
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
+  const [meals, setMeals] = useState([]);
 
-  const meals = [
-    {
-      name: "Veggie Delight",
-      desc: "Fresh vegetables and quinoa.",
-      category: "vegetarian",
-      img: "/Images/veggieDelight.jpeg"
-    },
-    {
-      name: "Keto Chicken",
-      desc: "Grilled chicken with low-carb veggies.",
-      category: "keto",
-      img: "/Images/ketoChicken.jpeg"
-    },
-    {
-      name: "Protein Power Bowl",
-      desc: "Packed with protein and nutrients.",
-      category: "high-protein",
-      img: "/Images/proteinPowerBowl.jpeg"
-    },
-    {
-      name: "Quinoa Salad",
-      desc: "Mixed greens and quinoa.",
-      category: "vegetarian",
-      img: "/Images/quinoaSalad.jpeg"
-    },
-    {
-      name: "Salmon Keto",
-      desc: "Grilled salmon with avocado.",
-      category: "keto",
-      img: "/Images/salmonKeto.jpeg"
-    },
-    {
-      name: "Beef Steak",
-      desc: "High-protein grilled beef steak.",
-      category: "high-protein",
-      img: "/Images/beefSteak.jpeg"
-    },
-  ];
+  // fetch meals from Firebase when the component loads
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const querySnapshot = await getDocs(collection(db, "meals"));
+      const mealData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMeals(mealData);
+    };
+    
+    fetchMeals();
+  }, []);
 
+  // filter meals based on category/search term
   const filteredMeals = meals.filter(meal =>
-    (category === "all" || meal.category === category) &&
+    (category === "all" || meal.categories.includes(category)) &&
     meal.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <><header className="header">
-      <nav className="navbar">
-        <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />          
-        </div>
-        <div className="nameApp">
-          <img src="/Images/nameApp.png" alt="NameApp" className="name" />
-        </div>
-        <ul className="nav-links">
-          <li><a href="/home-logged-in">Home</a></li>
-          <li><a href="/search">Search Menu</a></li>
-          <li><a href="/meal-detail">Nutrition Facts</a></li>
-          <li><a href="/special-offers">Special Offers</a></li>
-          <li><a href="/track-order">Track Order</a></li>
-          <li><a href="/cart">MyCart</a></li>
-          <li><a href="/">Logout</a></li>
-          
-        </ul>
-        <button className="login-btn" onClick={() => window.location.href = '/profile'}>
-          <img src="/Images/account.svg" alt="User" className="user-icon" />
-          MyAccount
-        </button>
-      </nav>
-
-    </header>
-      
-    <section className="cart-container">
-    <h1>Search for Prepped Meals</h1>
-      <p>Fresh, delicious, and delivered to your doorstep.</p>
-
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search meals..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="all">All Categories</option>
-          <option value="vegetarian">Vegetarian</option>
-          <option value="keto">Keto</option>
-          <option value="high-protein">High Protein</option>
-        </select>
-      </div>
-
-      <div className="meal-grid">
-        {filteredMeals.map((meal, index) => (
-          <div className="meal-card" key={index} data-category={meal.category}>
-            <img src={meal.img} alt={meal.name} className="meal-image" />
-            <h3>{meal.name}</h3>
-            <p>{meal.desc}</p>
+    <>
+      <header className="header">
+        <nav className="navbar">
+          <div className="logo-container">
+            <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
           </div>
-        ))}
-      </div>
-
-    </section>
+          <div className="nameApp">
+            <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          </div>
+          <ul className="nav-links">
+            <li><a href="/home-logged-in">Home</a></li>
+            <li><a href="/search">Search Menu</a></li>
+            <li><a href="/meal-detail">Nutrition Facts</a></li>
+            <li><a href="/special-offers">Special Offers</a></li>
+            <li><a href="/track-order">Track Order</a></li>
+            <li><a href="/cart">MyCart</a></li>
+            <li><a href="/">Logout</a></li>
+          </ul>
+          <button className="login-btn" onClick={() => window.location.href = '/profile'}>
+            <img src="/Images/account.svg" alt="User" className="user-icon" />
+            MyAccount
+          </button>
+        </nav>
+      </header>
       
+      <section className="cart-container">
+        <h1>Search for Prepped Meals</h1>
+        <p>Fresh, delicious, and delivered to your doorstep.</p>
+
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search meals..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="all">All Categories</option>
+            <option value="Burgers & Fast Foods">Burgers & Fast Foods</option>
+            <option value="ComfortFood">Comfort Food</option>
+            <option value="Family">Family</option>
+            <option value="Gluten-Free">Gluten-Free</option>
+            <option value="High-Protein">High-Protein</option>
+            <option value="Italian">Italian</option>
+            <option value="Keto">Keto</option>
+            <option value="Kids">Kids</option>
+            <option value="Lebanese">Lebanese</option>
+            <option value="Low-Carb">Low-Carb</option>
+            <option value="Mexican">Mexican</option>
+            <option value="Soups">Soups</option>
+            <option value="Thai">Thai</option>
+            <option value="Vegan">Vegan</option>
+            <option value="Vegetarian">Vegetarian</option>
+          </select>
+
+        </div>
+
+        <div className="meals-grid">
+          {filteredMeals.map((meal) => (
+            <div className="meal-card" key={meal.id} data-category={meal.categories.join(", ")}> 
+              <img src={meal.imageUrl} alt={meal.name} className="meal-image" />
+              <h3>{meal.name}</h3>
+              <p>{meal.description}</p>
+            </div>
+          ))}
+        </div>
+
+      </section>
 
       <footer className="footer">
         <div className="footer-container">
