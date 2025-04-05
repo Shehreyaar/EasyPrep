@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../services/authService";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  sendPasswordResetEmail
+} from "firebase/auth";
 import '../css/styles.css';
+
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -22,6 +31,23 @@ function Login() {
       alert("Login failed: " + error.message);
     }
   };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email to reset your password.");
+      return;
+    }
+  
+    try {
+      await forgotPassword(email);
+      setMessage("A reset link has been sent to your email.");
+      setError("");
+    } catch (err) {
+      setError("Failed to send reset email.");
+      setMessage("");
+    }
+  };
+  
 
   return (
     <>
