@@ -19,10 +19,10 @@ function Register() {
       return "All fields must be filled.";
     }
     if (!/^[A-Za-z\s]{3,}$/.test(firstName)) {
-      return "First name must have at least 3 letters.";
+      return "First name must have at least 3 letters and no numbers.";
     }
     if (!/^[A-Za-z\s]{3,}$/.test(lastName)) {
-      return "Last name must have at least 3 letters.";
+      return "Last name must have at least 3 letters and no numbers.";
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
       return "Invalid email address.";
