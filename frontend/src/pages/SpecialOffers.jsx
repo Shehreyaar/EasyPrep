@@ -1,48 +1,100 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { db } from "../firebase.js";
+import { collection, getDocs } from "firebase/firestore";
 import "../css/stylesSearch.css";
 
 function SpecialOffers() {
-  const offers = [
+  const [meals, setMeals] = useState([]);
+  const [displayedMeals, setDisplayedMeals] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const indexRef = useRef(0);
+
+  const possibleOffers = [
     {
-      title: "Buy 1 and get 1 free!",
-      desc: "Order any meal and get another one free. Limited time offer!",
-      image: "/Images/salmonKeto.jpeg",
+      title: "Buy 3 boxes and get another free!",
+      desc: "",
     },
     {
-      title: "Buy 10x boxes and receive a 30% discount!",
-      desc: "Stock up and save big on bulk orders.",
-      image: "/Images/veggieDelight.jpeg",
+      title: "Recieve a 30% discount if you purchase 10 boxes or more!",
+      desc: "",
     },
     {
-      title: "Weekend Special - Free Dessert",
-      desc: "Every order above $50 gets a free dessert this weekend.",
-      image: "/Images/ketoChicken.jpeg",
+      title: "Have 15$ on us if your order is 50$ or more!",
+      desc: "",
     },
     {
-      title: "Free Delivery on Orders over $75",
-      desc: "Save on delivery charges for bigger orders.",
-      image: "/Images/quinoaSalad.jpeg",
+      title: "Receive $10 credit when you purchase 5 or more boxes!",
+      desc: "",
     },
   ];
 
-  const [timeLeft, setTimeLeft] = useState(3 * 24 * 60 * 60);
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+    const fetchMeals = async () => {
+      const querySnapshot = await getDocs(collection(db, "meals"));
+      const mealData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMeals(mealData);
+    };
 
-    return () => clearInterval(timer);
+    fetchMeals();
   }, []);
 
+  const getRandomOffer = () => {
+    const index = Math.floor(Math.random() * possibleOffers.length);
+    return possibleOffers[index];
+  };
+
+  const rotateOffers = () => {
+    if (meals.length === 0) return;
+
+    const start = indexRef.current;
+    const end = start + 5;
+    const nextMeals = meals.slice(start, end);
+
+    if (nextMeals.length === 0) {
+      indexRef.current = 0;
+      rotateOffers();
+      return;
+    }
+
+    const mealsWithOffers = nextMeals.map(meal => {
+      const offer = getRandomOffer();
+      return {
+        ...meal,
+        specialTitle: offer.title,
+        specialDesc: offer.desc,
+      };
+    });
+
+    setDisplayedMeals(mealsWithOffers);
+    setTimeLeft(30);
+    indexRef.current += 5;
+  };
+
+  useEffect(() => {
+    if (meals.length === 0) return;
+
+    rotateOffers();
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          rotateOffers();
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [meals]);
+
   const formatTime = (seconds) => {
-    const days = Math.floor(seconds / (24 * 60 * 60));
-    const hrs = Math.floor((seconds % (24 * 60 * 60)) / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
+    const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${days}d ${hrs.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -72,20 +124,21 @@ function SpecialOffers() {
         </nav>
       </header>
 
-      {/* Special Offers */}
+      {/* Special Offers Section */}
       <section className="cart-container">
         <h1>Special Offers</h1>
-        <p>Don't miss out on these exclusive deals!</p>
+        <p>Don't miss out on these exclusive deals! New offers Daily!</p>
 
         <div className="meal-grid">
-          {offers.map((offer, index) => (
-            <div className="meal-card" key={index}>
-              <img src={offer.image} alt={offer.title} className="meal-image" />
-              <h3>{offer.title}</h3>
-              <p>{offer.desc}</p>
+          {displayedMeals.map((meal, index) => (
+            <div className="meal-card" key={meal.id || index}>
+              <img src={meal.imageUrl} alt={meal.name} className="meal-image" />
+              <h3>{meal.name}</h3>
+              <p>{meal.specialTitle}</p>
               <p style={{ fontWeight: "bold", color: "#C72B28", marginTop: "10px" }}>
                 Time Left: {formatTime(timeLeft)}
               </p>
+              <button name="addToCart" className="addToCart-btn" onClick={() => (window.location.href = "/cart")} > Add to Cart </button>
             </div>
           ))}
         </div>
