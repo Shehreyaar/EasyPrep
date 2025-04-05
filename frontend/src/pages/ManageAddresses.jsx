@@ -1,30 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/styles.css";
 import { Link } from "react-router-dom";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
-function ManageAddresses() {
-  const [addresses, setAddresses] = useState([
-    { label: "Home", address: "123 Main Street, New York, NY" },
-    { label: "Work", address: "456 Office Blvd, Manhattan, NY" }
-  ]);
-  const [newLabel, setNewLabel] = useState("");
-  const [newAddress, setNewAddress] = useState("");
 
-  const handleAdd = (e) => {
+
+function ManageAddress() {
+  const [address, setAddress] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const uid = localStorage.getItem("uid");
+      if (!uid) return;
+
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        setAddress(data.address || "");
+      }
+    };
+
+    fetchAddress();
+  }, []);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (newLabel && newAddress) {
-      setAddresses([...addresses, { label: newLabel, address: newAddress }]);
-      setNewLabel("");
-      setNewAddress("");
+    const uid = localStorage.getItem("uid");
+    if (!uid) return;
+
+    try {
+      const userRef = doc(db, "users", uid);
+      await setDoc(userRef, { address }, { merge: true });
+      setMessage("Address updated successfully!");
+    } catch (err) {
+      console.error("Error updating address:", err);
+      setMessage("Failed to update address.");
     }
   };
 
-  const handleDelete = (index) => {
-    const updated = [...addresses];
-    updated.splice(index, 1);
-    setAddresses(updated);
-  };
-
+  
   return (
     <>
       <header className="header">
@@ -54,41 +71,24 @@ function ManageAddresses() {
       </header>
 
       <div className="address-container">
-        <h2>Manage Addresses</h2>
-
-        <div className="address-list">
-          {addresses.map((addr, index) => (
-            <div key={index} className="address-card">
-              <p><strong>{addr.label}:</strong> {addr.address}</p>
-              <button className="edit-btn" onClick={() => alert("Edit not implemented")}>Edit</button>
-              <button className="delete-btn" onClick={() => handleDelete(index)}>Delete</button>
-            </div>
-          ))}
-        </div>
-
-        <div className="add-address">
-          <h3>Add New Address</h3>
-          <form onSubmit={handleAdd}>
-            <input
-              type="text"
-              placeholder="Label (e.g., Home, Work)"
-              value={newLabel}
-              onChange={(e) => setNewLabel(e.target.value)}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Full Address"
-              value={newAddress}
-              onChange={(e) => setNewAddress(e.target.value)}
-              required
-            />
-            <button type="submit" className="submit-btn">Add Address</button>
-          </form>
-        </div>
+        <h2>Manage Address</h2>
+        <form onSubmit={handleSave} className="add-address">
+          <label htmlFor="address">My Address</label>
+          <input
+            type="text"
+            id="address"
+            value={address}
+            placeholder="Enter your full address"
+            onChange={(e) => setAddress(e.target.value)}
+            style={{ marginBottom: "10px" }}
+            required
+          />
+          <button type="submit" className="submit-btn">Save Address</button>
+        </form>
+        {message && <p style={{ marginTop: "10px", color: "#C72B28", fontWeight: "bold" }}>{message}</p>}
       </div>
     </>
   );
 }
 
-export default ManageAddresses;
+export default ManageAddress;

@@ -84,11 +84,12 @@ function Profile() {
             <Link to="/manage-address" className="edit-btn">Manage Address</Link>
           </div>
 
+          {/*
           <div className="profile-section">
             <h3>Security & Settings</h3>
             <p>Change Password</p>            
             <button className="edit-btn">Update Settings</button>
-          </div>
+          </div>*/}
         </div>
       </div>
     </>

@@ -1,22 +1,60 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../services/authService";
-import '../css/styles.css';
+import "../css/styles.css";
 
 function Register() {
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+
+  const validate = () => {
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !phone || !address) {
+      return "All fields must be filled.";
+    }
+    if (!/^[A-Za-z\s]{3,}$/.test(firstName)) {
+      return "First name must have at least 3 letters.";
+    }
+    if (!/^[A-Za-z\s]{3,}$/.test(lastName)) {
+      return "Last name must have at least 3 letters.";
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return "Invalid email address.";
+    }
+    if (password.length < 6) {
+      return "Password must have at least 6 characters.";
+    }
+    if (password !== confirmPassword) {
+      return "Passwords do not match.";
+    }
+    if (!/^\d{3} \d{3} \d{4}$/.test(phone)) {
+      return "Phone must be in format xxx xxx xxxx.";
+    }
+    if (address.length < 5) {
+      return "Address must have at least 5 characters.";
+    }
+    return "";
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const error = validate();
+    if (error) {
+      setErrorMsg(error);
+      return;
+    }
+
     try {
-      await register(email, password, fullName);
-      alert("Account successfully created!");
+      await register(email, password, firstName, lastName, phone, address);
       navigate("/login");
     } catch (error) {
-      alert("Error creating account: " + error.message);
+      setErrorMsg("Error creating account: " + error.message);
     }
   };
 
@@ -46,12 +84,21 @@ function Register() {
         <div className="auth-box">
           <h2>Create an account</h2>
           <form onSubmit={handleRegister}>
-            <label>Full Name</label>
+            <label>First Name</label>
             <input
               type="text"
-              placeholder="Enter your full name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Enter your first name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+
+            <label>Last Name</label>
+            <input
+              type="text"
+              placeholder="Enter your last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               required
             />
 
@@ -64,6 +111,24 @@ function Register() {
               required
             />
 
+            <label>Phone Number</label>
+            <input
+              type="text"
+              placeholder="123 456 7890"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+
+            <label>Address</label>
+            <input
+              type="text"
+              placeholder="123 Easy Street"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+            />
+
             <label>Password</label>
             <input
               type="password"
@@ -73,8 +138,19 @@ function Register() {
               required
             />
 
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Repeat your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+
             <button type="submit" className="submit-btn">Sign Up</button>
           </form>
+
+          {errorMsg && <p className="error-message">{errorMsg}</p>}
 
           <p className="switch-auth">
             Already have an account? <Link to="/login">Log in</Link>
@@ -86,3 +162,4 @@ function Register() {
 }
 
 export default Register;
+
