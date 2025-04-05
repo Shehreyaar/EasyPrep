@@ -6,12 +6,17 @@ import '../css/styles.css';
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      const userCredential = await login(email, password, rememberMe);
+      const user = userCredential.user;
+
+      localStorage.setItem("uid", user.uid);
+      //await login(email, password);
       navigate("/home-logged-in");
     } catch (error) {
       alert("Login failed: " + error.message);
@@ -63,8 +68,12 @@ function Login() {
             />
 
             <div className="login-options">
-              <label><input type="checkbox" /> Remember me</label>
-              <a href="#">Lost your password?</a>
+              <label>
+                <input type="checkbox" checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
+                /> Remember me
+              </label>
+              <Link to="/forgot-password">Forgot your password?</Link>
             </div>
 
             <button type="submit" className="submit-btn">Log In</button>
