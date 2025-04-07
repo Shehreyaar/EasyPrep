@@ -59,7 +59,7 @@ function Login() {
           <img src="/Images/nameApp.png" alt="NameApp" className="name" />
         </div>
         <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
+          <Link to="/">Home</Link>
           <Link to="/search">Search Menu</Link>
           <Link to="#">Special Offers</Link>
           <Link to="#">Nutrition Facts</Link>
