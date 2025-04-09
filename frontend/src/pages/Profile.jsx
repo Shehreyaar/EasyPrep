@@ -33,24 +33,24 @@ function Profile() {
   return (
     <>
       <header className="header">
-        <div className="logo-container">
+      <div className="logo-container">
+        <Link to="/home-logged-in">
           <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
-        </div>
-        <div className="nameApp">
+        </Link>
+      </div>
+      <div className="nameApp">
+        <Link to="/home-logged-in">
           <img src="/Images/nameApp.png" alt="NameApp" className="name" />
-        </div>
-
-        <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
-          <Link to="/search">Search Menu</Link>
-          <Link to="/meal-detail">Nutrition Facts</Link>
-          <Link to="#">BoxMeals</Link>
-          <Link to="#">Track Order</Link>
-          <Link to="/cart">MyCart</Link>
-          <Link to="/">Logout</Link>
-        </nav>
-
-
+        </Link>
+      </div>
+      <nav className="nav-menu">
+        <Link to="/search">Search Menu</Link>
+        <Link to="/meal-detail">Nutrition Facts</Link>
+        <Link to="/special-offers">Special Offers</Link>
+        <Link to="/track-order">Track Order</Link>
+        <Link to="/cart">My Cart</Link>
+        <Link to="/">Logout</Link>
+      </nav>
         <button className="login-btn" onClick={() => alert("Logout clicked!")}>
           <img src="/Images/account.svg" alt="User" className="user-icon" />
           Logout
@@ -81,13 +81,15 @@ function Profile() {
             <div className="address">
               <p>{address || "..."}</p>
             </div>
-            <Link to="/manage-address" className="edit-btn">Manage Address</Link>
+            <Link to="/manage-addresses" className="edit-btn">Manage Address</Link>
           </div>
 
           <div className="profile-section">
             <h3>Security & Settings</h3>
-            <p>Change Password</p>            
-            <button className="edit-btn">Update Settings</button>
+            <div className="settings">
+            <p>Change Password</p>
+            </div>    
+            <Link to="/settings" className="edit-btn">Update Settings</Link>
           </div>
         </div>
       </div>

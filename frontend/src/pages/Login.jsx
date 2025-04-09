@@ -26,19 +26,22 @@ function Login() {
   return (
     <>
       <header className="header">
-        <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
-        </div>
-        <div className="nameApp">
-          <img src="/Images/nameApp.png" alt="NameApp" className="name" />
-        </div>
-        <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
-          <Link to="/search">Search Menu</Link>
-          <Link to="/meal-detail">Nutrition Facts</Link>
-          <Link to="/special-offers">Special Offers</Link>
-          <Link to="/track-order">Track Order</Link>
-        </nav>
+  <div className="logo-container">
+    <Link to="/">
+      <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+    </Link>
+  </div>
+  <div className="nameApp">
+    <Link to="/">
+      <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+    </Link>
+  </div>
+      <nav className="nav-menu">
+        <Link to="/login">Search Menu</Link>
+        <Link to="/login">Nutrition Facts</Link>
+        <Link to="/login">Special Offers</Link>
+        <Link to="/login">Track Order</Link>
+      </nav>
         <button className="login-btn">
           <img src="/Images/account.svg" alt="User" className="user-icon" />
           Login/Signup

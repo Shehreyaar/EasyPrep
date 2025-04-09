@@ -41,19 +41,22 @@ function Cart() {
   return (
     <>
       <header className="header">
-        <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          <div className="logo-container">
+          <a href="/home-logged-in">
+            <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
+          </a>
         </div>
         <div className="nameApp">
+        <a href="/home-logged-in">
           <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          </a>
         </div>
         <nav className="nav-menu">
-          <a href="/home-logged-in">Home</a>
           <a href="/search">Search Menu</a>
           <a href="/meal-detail">Nutrition Facts</a>
           <a href="/special-offers">Special Offers</a>
           <a href="/track-order">Track Order</a>
-          <a href="/cart">MyCart</a>
+          <a href="/cart">My Cart</a>
           <a href="/">Logout</a>
         </nav>
         
