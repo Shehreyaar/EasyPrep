@@ -1,9 +1,11 @@
 import admin from "firebase-admin";
 import { readFileSync } from "fs";
+import path from "path";
 
 // privatekey (service account) save as serviceAccountKey.json
+const serviceAccountPath = path.resolve("serviceAccountKey.json");
 const serviceAccount = JSON.parse(
-  readFileSync("./serviceAccountKey.json", "utf8")
+  readFileSync(serviceAccountPath, "utf8")
 );
 
 admin.initializeApp({
@@ -20,6 +22,7 @@ export async function verifyToken(req, res, next) {
     req.user = decodedToken;
     next();
   } catch (error) {
+    console.error("❌ Token inválido:", error); 
     return res.status(401).send("Invalid token");
   }
 }

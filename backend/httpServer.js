@@ -65,7 +65,7 @@ app.post('/register', async (req, res) => {
       if (data.error) {
         return res.status(400).json({ error: data.error.message });
       }
-  
+      console.log("Login response from Firebase:", data); // DEBUG
       res.json({ idToken: data.idToken, uid: data.localId });
     } catch (error) {
       res.status(500).json({ error: 'Login failed' });
@@ -266,7 +266,7 @@ app.delete('/cart/:mealId',verifyToken, function (req, res) {
 // ============================================
 
 //Read all meals 
-app.get('/meals', async function (req, res) {
+app.get('/meals',verifyToken,  async function (req, res) {
   //res.json(mealList); //returns the meal list 
   try {
     const snapshot = await admin.firestore().collection("meals").get();
@@ -276,12 +276,13 @@ app.get('/meals', async function (req, res) {
     }));
     res.json(meals);
   } catch (error) {
+    console.error("🔥 FIRESTORE ERROR:", error);
     res.status(500).json({ error: "Failed to fetch meals" });
   }
 });
 
 //Read a meal by ID
-app.get('/meals/:id', function (req, res,) {
+app.get('/meals/:id', verifyToken,  function (req, res,) {
   const mealId = parseInt(req.params.id);
   const meal = mealList.find(m => m.id === mealId);
 

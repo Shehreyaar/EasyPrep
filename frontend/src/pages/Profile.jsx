@@ -49,9 +49,9 @@ function Profile() {
         </nav>
 
 
-        <button className="login-btn" onClick={() => alert("Logout clicked!")}>
+        <button className="login-btn" onClick={() => window.location.href = '/profile'}>
           <img src="/Images/account.svg" alt="User" className="user-icon" />
-          Logout
+          MyAccount
         </button>
       </header>
 

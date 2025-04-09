@@ -14,6 +14,7 @@ function Search() {
       //const mealData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       try{
         const token = sessionStorage.getItem("token");
+        console.log("🔥 Token enviado:", token);
         const response = await fetch("http://localhost:3000/meals", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -22,7 +23,16 @@ function Search() {
         const data = await response.json();
         setMeals(data); // this line stays the same
 
-      } catch {
+
+        // verify if it's array
+        if (Array.isArray(data)) {
+          setMeals(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setMeals([]);
+        }
+
+      } catch (error) {
         console.error("Error fetching meals:", error);
 
       }     
