@@ -15,7 +15,12 @@ function MealDetail({ addToCart, cartLength }) {
         //mealsData[doc.id] = { id: doc.id, ...doc.data() };
       //});
       try {
-        const res = await fetch("http://127.0.0.1:3000/meals");
+        const token = sessionStorage.getItem("token");
+        const res = await fetch("http://127.0.0.1:3000/meals", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }); 
         const data = await res.json();
         const mealsData = {};
         data.forEach((meal) => {

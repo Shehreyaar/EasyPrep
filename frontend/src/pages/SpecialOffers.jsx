@@ -29,12 +29,24 @@ function SpecialOffers() {
 
   useEffect(() => {
     const fetchMeals = async () => {
-      const querySnapshot = await getDocs(collection(db, "meals"));
-      const mealData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setMeals(mealData);
+      try {
+        const token = sessionStorage.getItem("token");
+        const res = await fetch("http://127.0.0.1:3000/meals", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setMeals(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setMeals([]);
+        }
+      } catch (error) {
+        console.error("Error fetching meals:", error);
+      }
     };
 
     fetchMeals();
@@ -137,7 +149,7 @@ function SpecialOffers() {
               <p style={{ fontWeight: "bold", color: "#C72B28", marginTop: "10px" }}>
                 Time Left: {formatTime(timeLeft)}
               </p>
-              <button name="addToCart" className="addToCart-btn" onClick={() => (window.location.href = "/cart")} > Add to Cart </button>
+              <button name="addToCart" className="add-to-cart-btn" onClick={() => (window.location.href = "/cart")} > Add to Cart </button>
             </div>
           ))}
         </div>

@@ -17,6 +17,8 @@ export async function login(email, password) {
 
   sessionStorage.setItem("uid", data.uid);
   sessionStorage.setItem("token", data.idToken);
+  console.log("TOKEN SAVED:", sessionStorage.getItem("token")); // debug
+  console.log("UID SAVED:", sessionStorage.getItem("uid"));//debug
   
   return data;
 }
