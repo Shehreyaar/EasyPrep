@@ -3,6 +3,13 @@ import "../css/styles.css";
 import { Link } from "react-router-dom";
 
 function HomeLoggedIn() {
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("uid");
+  };
+
+
   return (
     <>
       <header className="header">
@@ -20,7 +27,7 @@ function HomeLoggedIn() {
           <Link to="/special-offers">Special Offers</Link>
           <Link to="/track-order">Track Order</Link>
           <Link to="/cart">My Cart</Link>
-          <Link to="/">Logout</Link>
+          <Link to="/" onClick={handleLogout}>Logout</Link>
         </nav>
 
         <button

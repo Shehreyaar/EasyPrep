@@ -1,31 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../services/authService";
-import {
-  signInWithEmailAndPassword,
-  setPersistence,
-  browserLocalPersistence,
-  browserSessionPersistence,
-  sendPasswordResetEmail
-} from "firebase/auth";
+import { login, forgotPassword } from "../services/authService";
 import '../css/styles.css';
 
 
 function Login() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [password, setPassword] = useState(""); 
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await login(email, password, rememberMe);
-      const user = userCredential.user;
-
-      localStorage.setItem("uid", user.uid);
-      //await login(email, password);
+      await login(email, password);
       navigate("/home-logged-in");
     } catch (error) {
       alert("Login failed: " + error.message);
@@ -93,12 +82,7 @@ function Login() {
               required
             />
 
-            <div className="login-options">
-              <label>
-                <input type="checkbox" checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                /> Remember me
-              </label>
+            <div className="login-options">              
               <Link to="/forgot-password">Forgot your password?</Link>
             </div>
 

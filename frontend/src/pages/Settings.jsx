@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { auth } from "../firebase";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { Link } from "react-router-dom";
 import "../css/styles.css";
 
@@ -12,23 +10,46 @@ function Settings() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    const user = auth.currentUser;
 
-    if (!user) return alert("Usuário não autenticado");
-    if (newPassword !== confirmPassword) return alert("As senhas não coincidem");
+   // const user = auth.currentUser;
 
-    const credential = EmailAuthProvider.credential(currentEmail, currentPassword);
+    //if (!user) return alert("Usuário não autenticado");
+    if (newPassword !== confirmPassword){
+      alert("Passwords do not match.");
+      return;
+    }
+
+    //const credential = EmailAuthProvider.credential(currentEmail, currentPassword);
 
     try {
-      await reauthenticateWithCredential(user, credential);
-      await updatePassword(user, newPassword);
-      alert("Senha atualizada com sucesso");
+      const token = sessionStorage.getItem("token");
+
+      const res = await fetch("http://127.0.0.1:3000/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          email: currentEmail,
+          currentPassword,
+          newPassword
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Password update failed");
+      }
+
+      alert("Password updated successfully.");
       setCurrentEmail("");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error) {
-      alert("Erro ao atualizar senha: " + error.message);
+    } catch (err) {
+      alert("Error: " + err.message);
     }
   };
 

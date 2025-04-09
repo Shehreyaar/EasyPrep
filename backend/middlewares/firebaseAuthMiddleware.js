@@ -23,3 +23,5 @@ export async function verifyToken(req, res, next) {
     return res.status(401).send("Invalid token");
   }
 }
+
+export {admin};

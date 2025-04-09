@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../css/styles.css";
 import { Link, useNavigate } from "react-router-dom";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getAuth, updateProfile } from "firebase/auth";
-import { db } from "../firebase";
+import { updateProfileBackend, getProfileBackend } from "../services/authService";
 
 function EditProfile() {
   const [firstName, setFirstName] = useState("");
@@ -15,30 +13,14 @@ function EditProfile() {
 
   // Load user data from Firestore
   useEffect(() => {
-    const fetchUserData = async () => {
-      const uid = localStorage.getItem("uid");
-      if (!uid) {
-        setError("User not logged in.");
-        return;
-      }
-
+    const fetchUserData = async () => {      
       try {
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          console.log("Data Firestore:", data);
-          
-          setFirstName(data.firstName || "");
-          setLastName(data.lastName || "");
-          setPhone(data.phoneNumber || "");
-          setAddress(data.address || "");
-        } else {
-          setError("User data not found.");
-        }
+        const data = await getProfileBackend();
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setPhone(data.phoneNumber || "");
+        setAddress(data.address || "");
       } catch (err) {
-        console.error(err);
         setError("Error fetching user data.");
       }
     };
@@ -71,53 +53,12 @@ function EditProfile() {
       return;
     }
 
-    const uid = localStorage.getItem("uid");
-    if (!uid) {
-      setError("User not logged in.");
-      return;
-    }
-
-    const auth = getAuth();
-    let currentUser = auth.currentUser;
-
-    if (!currentUser) {
-      await new Promise((resolve) => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-          currentUser = user;
-          unsubscribe();
-          resolve();
-        });
-      });
-    }
-
-    if (!currentUser) {
-      setError("User not authenticated.");
-      return;
-    }
-
-    const userRef = doc(db, "users", uid);
-
     try {
-      await setDoc(
-        userRef,
-        {
-          firstName,
-          lastName,
-          phoneNumber: phone,
-          address,
-        },
-        { merge: true }
-      );
-
-      await updateProfile(currentUser, {
-        displayName: `${firstName} ${lastName}`,
-      });
-
+      await updateProfileBackend({ firstName, lastName, phoneNumber: phone, address });
       navigate("/profile");
     } catch (err) {
-      console.error("Error saving:", err);
       setError("Error updating profile: " + err.message);
-    }
+    }    
   };
 
   return (

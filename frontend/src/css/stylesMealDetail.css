@@ -121,15 +121,17 @@ body {
 /* Meal Details */
 .meal-details {
     background: white;
-    padding: 30px;
-    width: 400px;
+    padding: 20px;
+    width: 600px;
+    max-height: 80vh; 
+    overflow-y: auto;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-    display: block;
+    
 }
 
 .meal-details img {
@@ -152,13 +154,60 @@ body {
 }
 
 .close-btn {
-    background: red;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #fff;
+  color: #C72B28;
+  border: 2px solid #C72B28;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.close-btn:hover {
+    background-color: #C72B28;
+    color: white;
+}
+
+.add-to-cart-btn {
+    background-color: #27ae60;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 20px;
     cursor: pointer;
-    float: right;
+    transition: background-color 0.3s;
 }
+
+.add-to-cart-btn:hover {
+    background-color: #219150;
+}
+
+
+.meal-info-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+  }
+  
+  .meal-img {
+    width: 45%;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  
+  .meal-info {
+    width: 50%;
+    text-align: left;
+  }
 
 /* --- FOOTER --- */
 .footer {
@@ -229,6 +278,51 @@ body {
 .social-icons a img:hover {
     opacity: 0.7;
 }
+
+/* Meal Selected Detail */
+.two-column-layout {
+    display: flex;
+    gap: 40px;
+    width: 70%;
+    height: 80vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .image-section {
+    flex: 1;
+  }
+  
+  .image-section img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .info-section {
+    flex: 2;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .spaced-block {
+    margin-bottom: 15px;
+  }
+  
+  .price-display span {
+    font-size: 22px;
+    color: #C72B28;
+    font-weight: bold;
+  }
+  
 
 /* footer */
 .footer-bottom {
