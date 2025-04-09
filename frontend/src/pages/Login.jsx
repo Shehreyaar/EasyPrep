@@ -35,9 +35,9 @@ function Login() {
         <nav className="nav-menu">
           <Link to="/home-logged-in">Home</Link>
           <Link to="/search">Search Menu</Link>
-          <Link to="#">Special Offers</Link>
-          <Link to="#">Nutrition Facts</Link>
-          <Link to="#">Track Order</Link>
+          <Link to="/meal-detail">Nutrition Facts</Link>
+          <Link to="/special-offers">Special Offers</Link>
+          <Link to="/track-order">Track Order</Link>
         </nav>
         <button className="login-btn">
           <img src="/Images/account.svg" alt="User" className="user-icon" />

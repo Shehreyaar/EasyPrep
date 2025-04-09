@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import '../css/styles.css';
 import { Link } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 
 
 function Home() {
+  const [meals, setMeals] = useState([]);
+const [selectedCategory, setSelectedCategory] = useState('Family');
+
+useEffect(() => {
+  const fetchMeals = async () => {
+    const querySnapshot = await getDocs(collection(db, "meals"));
+    const allMeals = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setMeals(allMeals);
+  };
+
+  fetchMeals();
+}, []);
+
+const filteredMeals = selectedCategory
+  ? meals.filter(meal => meal.categories?.includes(selectedCategory))
+  : meals;
+
   return (
     <>
       <header className="header">
@@ -69,25 +88,34 @@ function Home() {
 
       {/* Menu categories */}
       <section className="menu-categories">
-        {["Vegan", "Vegetarian", "Family", "Thai", "Mexican", "Gluten-Free", "Low-Carb"].map(cat => (
-          <div key={cat} className="category" data-category={cat}>{cat}</div>
-        ))}
+  {["Vegan", "Vegetarian", "Family", "Thai", "Mexican", "Gluten-Free", "Low-Carb"].map(cat => (
+        <div
+          key={cat}
+          className={`category ${selectedCategory === cat ? 'active' : ''}`}
+          data-category={cat}
+          onClick={() => setSelectedCategory(cat)}
+        >
+          {cat}
+        </div>
+  ))}
       </section>
+
 
       {/* Menu scroll */}
       <section className="menu-scroll">
         <div className="menu-container">
-          {["hamburguer", "steak", "spaguetti", "tacos", "hamburguer", "tacos"].map((img, index) => (
-            <div key={index} className="menu-item">
-              <img src={`/Images/${img}.png`} alt={img} className="menu-img" />
+          {filteredMeals.map((meal) => (
+            <div key={meal.id} className="menu-item">
+              <img src={meal.imageUrl} alt={meal.name} className="menu-img" />
               <div className="menu-info">
-                <h3>Family</h3>
-                <p>{img.charAt(0).toUpperCase() + img.slice(1)}</p>
+                <h3>{meal.category}</h3>
+                <p>{meal.name}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
+
 
       {/* Popular categories */}
       <section className="popular-categories">
@@ -124,10 +152,10 @@ function Home() {
           <div className="footer-column">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="#">Search Menu</a></li>
-              <li><a href="#">Special Offers</a></li>
-              <li><a href="#">Box Meals</a></li>
-              <li><a href="#">Track Order</a></li>
+              <li><a href="/search">Search Menu</a></li>
+              <li><a href="/meal-detail">Nutrition Facts</a></li>
+              <li><a href="/special-offers">Special Offers</a></li>
+              <li><a href="/track-order">Track Order</a></li>
             </ul>
           </div>
           <div className="footer-column">

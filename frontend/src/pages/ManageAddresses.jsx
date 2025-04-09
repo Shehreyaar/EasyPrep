@@ -36,13 +36,13 @@ function ManageAddresses() {
         </div>
 
         <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
-          <Link to="/search">Search Menu</Link>
-          <Link to="/meal-detail">Nutrition Facts</Link>
-          <Link to="#">BoxMeals</Link>
-          <Link to="#">Track Order</Link>
-          <Link to="/cart">MyCart</Link>
-          <Link to="/">Logout</Link>
+          <li><a href="/home-logged-in">Home</a></li>
+          <li><a href="/search">Search Menu</a></li>
+          <li><a href="/meal-detail">Nutrition Facts</a></li>
+          <li><a href="/special-offers">Special Offers</a></li>
+          <li><a href="/track-order">Track Order</a></li>
+          <li><a href="/cart">MyCart</a></li>
+          <li><a href="/">Logout</a></li>
         </nav>
 
         <button

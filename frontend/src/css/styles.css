@@ -337,20 +337,18 @@
 
 /* ---------------- SCROLLVIEW - ITENS ---------------- */
 .menu-scroll {
-    width: 100%;
-    overflow-x: auto; 
-    white-space: nowrap; 
-    padding: 20px 0;
-    
-}
-
-/* Container */
-.menu-container {
+    max-width: 1400px;
+    overflow-y: auto;
+    margin: 1rem 2rem;
+    padding-right: 0.5rem;
+  }
+  
+  .menu-container {
     display: flex;
-    gap: 20px; 
-    padding: 0 20px;
-}
-
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
 /* Each item - menu */
 .menu-item {
     width: 250px; 

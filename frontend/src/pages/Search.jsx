@@ -105,10 +105,10 @@ function Search() {
           <div className="footer-column">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="#">Search Menu</a></li>
-              <li><a href="#">Special Offers</a></li>
-              <li><a href="#">Box Meals</a></li>
-              <li><a href="#">Track Order</a></li>
+              <li><a href="/search">Search Menu</a></li>
+              <li><a href="/meal-detail">Nutrition Facts</a></li>
+              <li><a href="/special-offers">Special Offers</a></li>
+              <li><a href="/track-order">Track Order</a></li>
             </ul>
           </div>
           <div className="footer-column">
