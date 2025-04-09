@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/styles.css";
 import { Link } from "react-router-dom";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { getUserAddress, updateUserAddress } from "../services/authService";
 
 
 
@@ -12,14 +11,11 @@ function ManageAddress() {
 
   useEffect(() => {
     const fetchAddress = async () => {
-      const uid = localStorage.getItem("uid");
-      if (!uid) return;
-
-      const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        setAddress(data.address || "");
+      try {
+        const data = await getUserAddress();
+        setAddress(data.address);
+      } catch (err) {
+        setMessage("Failed to fetch address.");
       }
     };
 
@@ -28,15 +24,10 @@ function ManageAddress() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const uid = localStorage.getItem("uid");
-    if (!uid) return;
-
     try {
-      const userRef = doc(db, "users", uid);
-      await setDoc(userRef, { address }, { merge: true });
+      await updateUserAddress(address);
       setMessage("Address updated successfully!");
     } catch (err) {
-      console.error("Error updating address:", err);
       setMessage("Failed to update address.");
     }
   };

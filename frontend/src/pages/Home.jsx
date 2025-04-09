@@ -1,11 +1,12 @@
 import React from 'react';
 import '../css/styles.css';
 import { Link } from 'react-router-dom';
-import { getFirestore } from "firebase/firestore";
-
-
 
 function Home() {
+  const isLoggedIn = sessionStorage.getItem("token") !== null;
+
+
+
   return (
     <>
       <header className="header">
@@ -18,15 +19,15 @@ function Home() {
 
         <nav className="nav-menu">
           <Link to="/">Home</Link>
-          <Link to="/login">Search Menu</Link>
-          <Link to="/login">Nutrition Facts</Link>
-          <Link to="/login">Special Offers</Link>
-          <Link to="/login">Track Order</Link>
+          <Link to={isLoggedIn ? "/search" : "/login"}>Search Menu</Link>
+          <Link to={isLoggedIn ? "/meal-detail" : "/login"}>Nutrition Facts</Link>
+          <Link to={isLoggedIn ? "/special-offers" : "/login"}>Special Offers</Link>
+          <Link to={isLoggedIn ? "/track-order" : "/login"}>Track Order</Link>
         </nav>
 
-        <button className="login-btn" onClick={() => window.location.href = '/login'}>
+        <button className="login-btn" onClick={() => window.location.href =  isLoggedIn ? "/home-logged-in" : "/login"}>
           <img src="/Images/account.svg" alt="User" className="user-icon" />
-          Login/Signup
+          {isLoggedIn ? "Dashboard" : "Login/Signup"}
         </button>
       </header>
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../services/authService";
 import "../css/styles.css";
+import "../css/registrationForm.css";
 
 function Register() {
   const [firstName, setFirstName] = useState("");
@@ -11,42 +12,43 @@ function Register() {
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errors, setErrors] = useState({}); // validation errors
+  const [errorMsg, setErrorMsg] = useState(""); // error message for registration
   const navigate = useNavigate();
 
   const validate = () => {
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !phone || !address) {
-      return "All fields must be filled.";
+    const newErrors = {};
+
+    if (!firstName || !/^[A-Za-z\s]{3,}$/.test(firstName)) {
+      newErrors.firstName = "First name must have at least 3 letters and no numbers.";
     }
-    if (!/^[A-Za-z\s]{3,}$/.test(firstName)) {
-      return "First name must have at least 3 letters and no numbers.";
+    if (!lastName || !/^[A-Za-z\s]{3,}$/.test(lastName)) {
+      newErrors.lastName =  "Last name must have at least 3 letters and no numbers.";
     }
-    if (!/^[A-Za-z\s]{3,}$/.test(lastName)) {
-      return "Last name must have at least 3 letters and no numbers.";
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      return "Invalid email address.";
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email =  "Invalid email address.";
     }
     if (password.length < 6) {
-      return "Password must have at least 6 characters.";
+      newErrors.password =  "Password must have at least 6 characters.";
     }
     if (password !== confirmPassword) {
-      return "Passwords do not match.";
+      newErrors.confirmPassword =  "Passwords do not match.";
     }
     if (!/^\d{3} \d{3} \d{4}$/.test(phone)) {
-      return "Phone must be in format xxx xxx xxxx.";
+      newErrors.phone = "Phone must be in format xxx xxx xxxx.";
     }
     if (address.length < 5) {
-      return "Address must have at least 5 characters.";
+      newErrors.address = "Address must have at least 5 characters.";
     }
-    return "";
+    return newErrors;
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    const error = validate();
-    if (error) {
-      setErrorMsg(error);
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrorMsg("");
+      setErrors(validationErrors);
       return;
     }
 
@@ -84,23 +86,29 @@ function Register() {
         <div className="auth-box">
           <h2>Create an account</h2>
           <form onSubmit={handleRegister}>
-            <label>First Name</label>
-            <input
-              type="text"
-              placeholder="Enter your first name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
+          <div className="form-row">
+  <div className="form-group">
+    <label>First Name</label>
+    <input
+      type="text"
+      value={firstName}
+      onChange={(e) => setFirstName(e.target.value)}
+      required
+    />
+    {errors.firstName && <p className="error-message">{errors.firstName}</p>}
+  </div>
 
-            <label>Last Name</label>
-            <input
-              type="text"
-              placeholder="Enter your last name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
+  <div className="form-group">
+    <label>Last Name</label>
+    <input
+      type="text"
+      value={lastName}
+      onChange={(e) => setLastName(e.target.value)}
+      required
+    />
+    {errors.lastName && <p className="error-message">{errors.lastName}</p>}
+  </div>
+</div>
 
             <label>Email Address</label>
             <input
@@ -110,6 +118,7 @@ function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {errors.email && <p className="error-message">{errors.email}</p>}
 
             <label>Phone Number</label>
             <input
@@ -119,6 +128,7 @@ function Register() {
               onChange={(e) => setPhone(e.target.value)}
               required
             />
+            {errors.phone && <p className="error-message">{errors.phone}</p>}
 
             <label>Address</label>
             <input
@@ -128,6 +138,7 @@ function Register() {
               onChange={(e) => setAddress(e.target.value)}
               required
             />
+            {errors.address && <p className="error-message">{errors.address}</p>}
 
             <label>Password</label>
             <input
@@ -137,6 +148,7 @@ function Register() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            {errors.password && <p className="error-message">{errors.password}</p>}
 
             <label>Confirm Password</label>
             <input
@@ -146,11 +158,11 @@ function Register() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
+            {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
 
             <button type="submit" className="submit-btn">Sign Up</button>
-          </form>
-
-          {errorMsg && <p className="error-message">{errorMsg}</p>}
+            {errorMsg && <p className="error-message">{errorMsg}</p>}
+          </form>          
 
           <p className="switch-auth">
             Already have an account? <Link to="/login">Log in</Link>

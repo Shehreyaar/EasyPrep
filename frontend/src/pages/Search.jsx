@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebase.js"; 
-import { collection, getDocs } from "firebase/firestore";
 import "../css/stylesSearch.css";
 
 function Search() {
@@ -12,9 +10,22 @@ function Search() {
   // fetch meals from Firebase when the component loads
   useEffect(() => {
     const fetchMeals = async () => {
-      const querySnapshot = await getDocs(collection(db, "meals"));
-      const mealData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMeals(mealData);
+      //const querySnapshot = await getDocs(collection(db, "meals"));  // it cannot access directly anymore
+      //const mealData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      try{
+        const token = sessionStorage.getItem("token");
+        const response = await fetch("http://localhost:3000/meals", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setMeals(data); // this line stays the same
+
+      } catch {
+        console.error("Error fetching meals:", error);
+
+      }     
     };
     
     fetchMeals();

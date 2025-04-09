@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { db } from "../firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 import "../css/stylesSearch.css";
 

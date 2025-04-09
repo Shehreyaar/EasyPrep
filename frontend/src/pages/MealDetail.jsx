@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase"; 
 import "../css/stylesMealDetail.css";
 
 function MealDetail({ addToCart, cartLength }) {
@@ -11,12 +9,22 @@ function MealDetail({ addToCart, cartLength }) {
 
   useEffect(() => {
     const fetchMeals = async () => {
-      const querySnapshot = await getDocs(collection(db, "meals"));
-      const mealsData = {};
-      querySnapshot.forEach((doc) => {
-        mealsData[doc.id] = { id: doc.id, ...doc.data() };
-      });
-      setMeals(mealsData);
+      //const querySnapshot = await getDocs(collection(db, "meals"));
+      //const mealsData = {};
+      //querySnapshot.forEach((doc) => {
+        //mealsData[doc.id] = { id: doc.id, ...doc.data() };
+      //});
+      try {
+        const res = await fetch("http://127.0.0.1:3000/meals");
+        const data = await res.json();
+        const mealsData = {};
+        data.forEach((meal) => {
+          mealsData[meal.id] = meal;
+        });
+        setMeals(mealsData); // this line stays the same
+      } catch (error) {
+        console.error("Failed to load meals:", error);
+      }
     };
 
     fetchMeals();
@@ -77,51 +85,49 @@ function MealDetail({ addToCart, cartLength }) {
       </div>
 
       {selectedMeal && (
-        <div id="meal-details" className="meal-details">
-          <button id="close-btn" onClick={handleClose}>X</button>
-          <h2>{selectedMeal.name}</h2>
+      <div id="meal-details" className="meal-details two-column-layout">
+        <button className="close-btn" onClick={handleClose}>X</button>
+        <div className="image-section">
           <img src={selectedMeal.imageUrl || "/Images/default-meal.jpg"} alt={selectedMeal.name} />
-          <p>{selectedMeal.description}</p>
+        </div>
+        <div className="info-section">
+          <h2>{selectedMeal.name}</h2>
 
-          {/* meal availability */}
-          <p>
+          <p className="spaced-block">{selectedMeal.description}</p>
+
+          <p className="spaced-block">
             <strong>Availability:</strong>{" "}
             <span style={{ color: selectedMeal.isAvailable ? "green" : "red" }}>
               {selectedMeal.isAvailable ? "Available" : "Out of Stock"}
             </span>
           </p>
 
-          {/* list of ingredients */}
-          <h3>Ingredients</h3>
-          <ul>
-            {/* if there are ingredients, display them, else show message that there are none listed */}
-            {selectedMeal.ingredients?.length > 0 ? (
-              selectedMeal.ingredients.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
-              ))
-            ) : (
-              <li>No ingredients listed.</li>
-            )}
-          </ul>
+          <div className="spaced-block">
+            <h3>Ingredients</h3>
+            <p>{selectedMeal.ingredients?.length > 0
+              ? selectedMeal.ingredients.join(", ")
+              : "No ingredients listed."}</p>
+          </div>
 
-          {/* nutritional facta  */}
-          <h3>Nutrition Facts</h3>
-          <ul>
-            <li>Calories: {selectedMeal.calories || "N/A"}</li>
-            <li>Protein: {selectedMeal.protein || "N/A"}</li>
-            <li>Carbs: {selectedMeal.carbs || "N/A"}</li>
-            <li>Fat: {selectedMeal.fat || "N/A"}</li>
-          </ul>
+          <div className="spaced-block">
+            <h3>Nutrition Facts</h3>
+            <p>
+              Calories: {selectedMeal.calories || "N/A"} | Protein: {selectedMeal.protein || "N/A"} | 
+              Carbs: {selectedMeal.carbs || "N/A"} | Fat: {selectedMeal.fat || "N/A"}
+            </p>
+          </div>
 
-          <p><strong>Price:</strong> ${selectedMeal.price ? selectedMeal.price.toFixed(2) : "N/A"}</p>
+          <p className="price-display spaced-block">
+            <strong>Price:</strong> <span>${selectedMeal.price ? selectedMeal.price.toFixed(2) : "N/A"}</span>
+          </p>
 
           <button onClick={handleAddToCart} className="add-to-cart-btn">
             Add to Cart
           </button>
         </div>
-      )}
-    </>
-  );
-}
+      </div>
+    )}
+  </>
+);}
 
 export default MealDetail;
