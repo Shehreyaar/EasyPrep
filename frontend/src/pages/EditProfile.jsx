@@ -65,18 +65,21 @@ function EditProfile() {
     <>
       <header className="header">
         <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          <Link to="/home-logged-in">
+            <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          </Link>
         </div>
         <div className="nameApp">
-          <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          <Link to="/home-logged-in">
+            <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          </Link>
         </div>
         <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
           <Link to="/search">Search Menu</Link>
           <Link to="/meal-detail">Nutrition Facts</Link>
-          <Link to="#">BoxMeals</Link>
-          <Link to="#">Track Order</Link>
-          <Link to="/cart">MyCart</Link>
+          <Link to="/special-offers">Special Offers</Link>
+          <Link to="/track-order">Track Order</Link>
+          <Link to="/cart">My Cart</Link>
           <Link to="/">Logout</Link>
         </nav>
         <button
@@ -84,7 +87,7 @@ function EditProfile() {
           onClick={() => (window.location.href = "/profile")}
         >
           <img src="/Images/account.svg" alt="User" className="user-icon" />
-          MyAccount
+          My Account
         </button>
       </header>
 

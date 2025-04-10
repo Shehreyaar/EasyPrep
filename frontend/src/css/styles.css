@@ -337,7 +337,7 @@
 
 /* ---------------- SCROLLVIEW - ITENS ---------------- */
 .menu-scroll {
-    width: 100%;
+    width: 1470px;
     overflow-x: auto; 
     white-space: nowrap; 
     padding: 20px 0;
