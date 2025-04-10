@@ -42,17 +42,20 @@ function Login() {
     <>
       <header className="header">
         <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          <Link to="/">
+            <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          </Link>
         </div>
         <div className="nameApp">
-          <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          <Link to="/">
+            <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          </Link>
         </div>
         <nav className="nav-menu">
-          <Link to="/">Home</Link>
-          <Link to="/search">Search Menu</Link>
-          <Link to="#">Special Offers</Link>
-          <Link to="#">Nutrition Facts</Link>
-          <Link to="#">Track Order</Link>
+          <Link to="/login">Search Menu</Link>
+          <Link to="/login">Special Offers</Link>
+          <Link to="/login">Nutrition Facts</Link>
+          <Link to="/login">Track Order</Link>
         </nav>
         <button className="login-btn">
           <img src="/Images/account.svg" alt="User" className="user-icon" />
