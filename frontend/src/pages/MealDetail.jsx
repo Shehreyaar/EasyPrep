@@ -41,13 +41,34 @@ function MealDetail({ addToCart, cartLength }) {
 
   const handleClose = () => setSelectedMeal(null);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async() => {
     if (!selectedMeal) return;
-    addToCart(selectedMeal);
+
+      try {
+    const token = sessionStorage.getItem("token");
+    const res = await fetch("http://127.0.0.1:3000/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // <-- this is important
+      },
+      body: JSON.stringify({
+        mealId: selectedMeal.id,
+        quantity: selectedMeal.quantity || 1,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to add to cart");
+    }
+
     alert(`${selectedMeal.name} added to cart!`);
     setSelectedMeal(null);
-    navigate("/cart"); // redirect to cart
-  };
+    navigate("/cart");
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+  }
+};
 
   return (
     <>

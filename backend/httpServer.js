@@ -198,6 +198,7 @@ app.post("/update-address", verifyToken, async (req, res) => {
 
 let cart = [];
 let wallet = 1000.00; //default wallet balance 
+const mealList = []
 
 function getIdx (mealId) {
     for (let i = 0; i < mealList.length; i++) {
@@ -208,44 +209,128 @@ function getIdx (mealId) {
     return null;
 }
 
-//Add meal to cart 
-app.post('/cart', verifyToken, function (req, res) {
-    const {mealId, quantity} = req.body;
-    const meal = mealList.find(m => m.id === mealId);
-
-    if (!meal) { //meal not found 
-        return res.status(404).send('Meal not found');
-    }
-
-    cart.push({meal, quantity});
-    res.status(200).send('Meal added successfully');
-});
-
 //Checkout 
-app.post('/checkout',verifyToken, function (req, res) {
-    if (cart.length === 0 ) {
-        return res.status(400).send('Cart is empty');
-    } 
+app.post('/checkout',verifyToken,async function (req, res) {
+    const uid = req.user.uid;
+    const clientCart = req.body.cart;
 
-    let total = 0;
-    for (let item of cart) {
-        total += item.meal.price * item.quantity; //calculate the total price 
+    if (!clientCart || clientCart.length === 0) {
+      return res.status(400).send('Cart is empty!');
     }
+
+    try{
+      // Calculate the total price of the cart
+      let total = 0;
+      const detailedItems = [];
+
+      for (let item of clientCart) {
+        const mealRef = admin.firestore().collection("meals").doc(item.meal.id);
+      const mealDoc = await mealRef.get();
+
+      if (!mealDoc.exists) continue;
+
+      const meal = mealDoc.data();
+      const price = meal.price || 0;
+      const quantity = item.quantity;
+
+      total += price * quantity;
+
+      detailedItems.push({
+        mealId: item.meal.id,
+        name: meal.name,
+        quantity,
+        price
+      });
+    }
+
+    // verify amount in wallet
+    const userRef = admin.firestore().collection("users").doc(uid);
+    const userSnap = await userRef.get();
+    const wallet = userSnap.data().wallet || 1000;
+  
 
     if (wallet < total) {
-        return res.status(403).send('Insufficient funds');
+      return res.status(403).send('Insufficient funds!');
     }
 
-    wallet -= total;
-    cart = []; //clear the cart after successful checkout
+    // Save order in Firestore
+    await admin.firestore().collection("orders").add({
+      userId: uid,
+      items: detailedItems,
+      totalAmount: total,
+      status: "Pending",
+      orderDate: new Date().toISOString()
 
-    res.status(200).send('Checkout successful. Your remaining balance is: ' + wallet);
+    });
+
+    // Clean cart, update amount wallet
+    await admin.firestore().collection("carts").doc(uid).set({ items: [] });
+    await userRef.update({ wallet: wallet - total });
+
+    res.status(200).send(`Checkout successful. Remaining balance: $${(wallet - total).toFixed(2)}`);
+  } catch (err) {
+    console.error("Checkout error:", err);
+    res.status(500).send("Server error during checkout.");
+  }
 });
+
+
 
 //View cart
-app.get('/cart', verifyToken, function (req, res) {
-    res.json(cart);
+// Assuming you're using Firestore or similar database:
+app.post("/cart", verifyToken, async (req, res) => {
+  const { mealId, quantity } = req.body;
+  const uid = req.user.uid;
+
+  try {
+    const mealRef = admin.firestore().collection("meals").doc(mealId);
+    const mealDoc = await mealRef.get();
+
+    if (!mealDoc.exists) return res.status(404).send("Meal not found");
+
+    const mealData = mealDoc.data();
+
+    const cartRef = admin.firestore().collection("carts").doc(uid);
+    const userCart = (await cartRef.get()).data() || { items: [] };
+
+    const existingItemIndex = userCart.items.findIndex(item => item.mealId === mealId);
+    if (existingItemIndex >= 0) {
+      userCart.items[existingItemIndex].quantity += quantity;
+    } else {
+      userCart.items.push({ mealId, quantity });
+    }
+
+    await cartRef.set(userCart);
+
+    res.status(200).json({ message: "Meal added to cart", cart: userCart });
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    res.status(500).send("Server error");
+  }
 });
+
+app.get("/cart", verifyToken, async (req, res) => {
+  const uid = req.user.uid;
+  try {
+    const cartDoc = await admin.firestore().collection("carts").doc(uid).get();
+    const cartData = cartDoc.exists ? cartDoc.data().items : [];
+
+    const detailedItems = await Promise.all(
+      cartData.map(async ({ mealId, quantity }) => {
+        const mealDoc = await admin.firestore().collection("meals").doc(mealId).get();
+        return {
+          meal: { id: mealDoc.id, ...mealDoc.data() },
+          quantity,
+        };
+      })
+    );
+
+    res.status(200).json(detailedItems);
+  } catch (error) {
+    res.status(500).send("Failed to fetch cart");
+  }
+});
+
 
 //Delete meal from cart 
 app.delete('/cart/:mealId',verifyToken, function (req, res) {
