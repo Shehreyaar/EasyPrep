@@ -113,19 +113,22 @@ function SpecialOffers() {
       {/* Header */}
       <header className="header">
         <nav className="navbar">
-          <div className="logo-container">
-            <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
+        <div className="logo-container">
+            <a href="/home-logged-in">
+              <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
+            </a>
           </div>
           <div className="nameApp">
+          <a href="/home-logged-in">
             <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+            </a>
           </div>
           <ul className="nav-links">
-            <li><a href="/home-logged-in">Home</a></li>
             <li><a href="/search">Search Menu</a></li>
             <li><a href="/meal-detail">Nutrition Facts</a></li>
             <li><a href="/special-offers">Special Offers</a></li>
             <li><a href="/track-order">Track Order</a></li>
-            <li><a href="/cart">MyCart</a></li>
+            <li><a href="/cart">My Cart</a></li>
             <li><a href="/">Logout</a></li>
           </ul>
           <button className="login-btn" onClick={() => window.location.href = '/profile'}>
@@ -165,10 +168,10 @@ function SpecialOffers() {
           <div className="footer-column">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="#">Search Menu</a></li>
-              <li><a href="#">Special Offers</a></li>
-              <li><a href="#">Box Meals</a></li>
-              <li><a href="#">Track Order</a></li>
+              <li><a href="/search">Search Menu</a></li>
+              <li><a href="/meal-detail">Nutrition Facts</a></li>
+              <li><a href="/special-offers">Special Offers</a></li>
+              <li><a href="/track-order">Track Order</a></li>
             </ul>
           </div>
           <div className="footer-column">

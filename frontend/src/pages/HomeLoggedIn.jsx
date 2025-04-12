@@ -1,27 +1,75 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../css/styles.css";
 import { Link } from "react-router-dom";
 
 function HomeLoggedIn() {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [meals, setMeals] = useState([]);
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("uid");
   };
 
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const response = await fetch("http://localhost:3000/meals", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          setMeals(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setMeals([]);
+        }
+      } catch (error) {
+        console.error("Error fetching meals:", error);
+      }
+    };
+
+    fetchMeals();
+  }, []);
+
+  const allCategories = [
+    "Vegan",
+    "Vegetarian",
+    "Family",
+    "Thai",
+    "Mexican",
+    "Gluten-Free",
+    "Low-Carb"
+  ];
+
+  // Filter meals based on selected category
+  const filteredMeals = selectedCategory === "all"
+    ? meals
+    : meals.filter(meal =>
+        meal.categories &&
+        meal.categories.map(c => c.toLowerCase()).includes(selectedCategory.toLowerCase())
+      );
 
   return (
     <>
+      {/* Header remains unchanged */}
       <header className="header">
         <div className="logo-container">
-          <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          <Link to="/home-logged-in">
+            <img src="/Images/logoEasyPrep.svg" alt="Logo" className="logo" />
+          </Link>
         </div>
         <div className="nameApp">
-          <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          <Link to="/home-logged-in">
+            <img src="/Images/nameApp.png" alt="NameApp" className="name" />
+          </Link>
         </div>
-
         <nav className="nav-menu">
-          <Link to="/home-logged-in">Home</Link>
           <Link to="/search">Search Menu</Link>
           <Link to="/meal-detail">Nutrition Facts</Link>
           <Link to="/special-offers">Special Offers</Link>
@@ -29,26 +77,21 @@ function HomeLoggedIn() {
           <Link to="/cart">My Cart</Link>
           <Link to="/" onClick={handleLogout}>Logout</Link>
         </nav>
-
-        <button
-          className="login-btn"
-          onClick={() => (window.location.href = "/profile")}
-        >
+        <button className="login-btn" onClick={() => (window.location.href = "/profile")}>
           <img src="/Images/account.svg" alt="User" className="user-icon" />
           MyAccount
         </button>
       </header>
 
+      {/* Welcome + Status Section */}
       <section className="horizontal-stack">
         <div className="text-content">
           <h1>Meal Prepping</h1>
           <h2>made Simple</h2>
         </div>
-
         <div className="banner-container">
           <img src="/Images/banner2.svg" alt="Banner" className="banner-img" />
         </div>
-
         <div className="orange-box">
           {[
             ["We've received your order", "Preparing box meal..."],
@@ -66,28 +109,40 @@ function HomeLoggedIn() {
         </div>
       </section>
 
+      {/* 👉 Food Categories (Clickable) */}
       <section className="menu-categories">
-        {["Vegan", "Vegetarian", "Family", "Thai", "Mexican", "Gluten-Free", "Low-Carb"].map(cat => (
-          <div key={cat} className="category" data-category={cat}>
+        {allCategories.map((cat) => (
+          <div
+            key={cat}
+            className={`category ${selectedCategory === cat ? "active" : ""}`}
+            onClick={() => setSelectedCategory(cat)}
+            data-category={cat}
+          >
             {cat}
           </div>
         ))}
       </section>
 
+      {/* 👉 Horizontal Scroll Meals View */}
       <section className="menu-scroll">
         <div className="menu-container">
-          {["hamburguer", "steak", "spaguetti", "tacos", "hamburguer", "tacos"].map((img, i) => (
-            <div key={i} className="menu-item">
-              <img src={`/Images/${img}.png`} alt={img} className="menu-img" />
-              <div className="menu-info">
-                <h3>Family</h3>
-                <p>{img.charAt(0).toUpperCase() + img.slice(1)}</p>
+          {filteredMeals.length > 0 ? (
+            filteredMeals.map((meal) => (
+              <div key={meal.id} className="menu-item">
+                <img src={meal.imageUrl} alt={meal.name} className="menu-img" />
+                <div className="menu-info">
+                  <h3>{meal.categories?.[0] || "Meal"}</h3>
+                  <p>{meal.name}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No meals available in this category.</p>
+          )}
         </div>
       </section>
 
+      {/* Popular Categories Section */}
       <section className="popular-categories">
         <h2 className="section-title">EasyPrep Popular Categories</h2>
         <div className="categories-scroll">
@@ -107,14 +162,12 @@ function HomeLoggedIn() {
         </div>
       </section>
 
+      {/* Bottom Banner */}
       <section className="full-width-banner">
-        <img
-          src="/Images/bannerBottom.jpg"
-          alt="BannerBottom"
-          className="full-banner-img"
-        />
+        <img src="/Images/bannerBottom.jpg" alt="BannerBottom" className="full-banner-img" />
       </section>
 
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-column">
@@ -124,10 +177,10 @@ function HomeLoggedIn() {
           <div className="footer-column">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="#">Browse Menu</a></li>
-              <li><a href="#">Special Offers</a></li>
-              <li><a href="#">Box Meals</a></li>
-              <li><a href="#">Track Order</a></li>
+              <li><a href="/search">Search Menu</a></li>
+              <li><a href="/meal-detail">Nutrition Facts</a></li>
+              <li><a href="/special-offers">Special Offers</a></li>
+              <li><a href="/track-order">Track Order</a></li>
             </ul>
           </div>
           <div className="footer-column">
