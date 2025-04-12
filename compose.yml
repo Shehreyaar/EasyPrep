@@ -1,0 +1,16 @@
+name: easy-prep-main
+services: 
+  web:
+    build: 
+      context: ./
+      target: final
+    container_name: web
+    develop:
+      watch:
+        - path: ./backend/package.json
+          action: rebuild
+        - path: ./backend/httpServer.js
+          target: /app/src/httpServer.js
+          action: sync
+    ports:
+      - '3000:3000'
