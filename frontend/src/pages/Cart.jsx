@@ -165,8 +165,7 @@ const Cart = () => {
         <h2 className="section-title">Your Cart</h2>
   
         {loading ? (
-          <p>Loading cart...</p>
-        ) : cart.length === 0 && !checkoutInfo ? (
+          <p>Loading cart...</p>        
         ) : cart.length === 0 && !checkoutInfo ? (
           <p>Your cart is empty.</p>
         ) : (
