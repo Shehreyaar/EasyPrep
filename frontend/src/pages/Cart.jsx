@@ -12,7 +12,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   
   const [walletBalance, setWalletBalance] = useState(null);
-
+  const [checkoutInfo, setCheckoutInfo] = useState(null);
   //sums up the total items in the cart by looping thru each item's quantity
   const cartLength = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -91,12 +91,15 @@ const Cart = () => {
         body: JSON.stringify({ cart }),  
       });
   
-      const responseData = await res.text();
+      //const responseData = await res.text();
+      const responseData = await res.json();
+      
       if (!res.ok) {
-        throw new Error(responseData);
+        throw new Error(responseData.error || "Checkout failed");
       }
   
-      alert(responseData); 
+      //alert(responseData); 
+      setCheckoutInfo(responseData);
       setCart([]);  //clears the cart after checking out 
 
     } catch (err) {
@@ -160,7 +163,7 @@ const Cart = () => {
 
         {loading ? (
           <p>Loading cart...</p>
-        ) : cart.length === 0 ? (
+        ) : cart.length === 0 && !checkoutInfo ? (
           <p>Your cart is empty.</p>
         ) : (
           cart.map((item) => (
@@ -190,10 +193,23 @@ const Cart = () => {
             >
               Proceed to Checkout
             </button>
-            {walletBalance !== null && (
-              <p className="wallet-balance">Remaining Balance: ${walletBalance.toFixed(2)}</p>
+            </>
+        )}
+
+        {checkoutInfo && (
+          <div className="checkout-result">
+            {checkoutInfo.error ? (
+              <p style={{ color: "red" }}>{checkoutInfo.error}</p>
+            ) : (
+              <>
+                <p><strong>Original Total:</strong> ${Number(checkoutInfo.totalAmount).toFixed(2)}</p>
+                <p><strong>Discount:</strong> -${Number(checkoutInfo.discount).toFixed(2)}</p>
+                <p><strong>Final Amount:</strong> ${Number(checkoutInfo.finalAmount).toFixed(2)}</p>
+                <p><strong>Remaining Wallet Balance:</strong> ${Number(checkoutInfo.remainingBalance).toFixed(2)}</p>
+                <p><strong>Discounts Applied:</strong> {checkoutInfo.discountsApplied.join(", ")}</p>
+              </>
             )}
-          </>
+          </div>
         )}
       </div>
     </>
