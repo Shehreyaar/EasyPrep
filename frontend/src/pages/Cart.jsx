@@ -1,20 +1,28 @@
-import React, { useState, useEffect } from "react";
 import "../css/styles.css";
 import "../css/cartStyle.css";
-// import { useNavigate } from "react-router-dom"; // Uncomment if using react-router
+import React, { useEffect, useState } from "react";
 
 const Cart = () => {
+  //cart ->  holds the array of meal items 
+  //setCart -> is use to update the value inside the cart 
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [walletBalance, setWalletBalance] = useState(null);
-  // const navigate = useNavigate(); // Uncomment if using react-router
 
+  //loading -> bool to tcheck if data is still being fetched 
+  //setLoading -> used to turn loading on or off 
+  const [loading, setLoading] = useState(true);
+  
+  const [walletBalance, setWalletBalance] = useState(null);
+
+  //sums up the total items in the cart by looping thru each item's quantity
   const cartLength = cart.reduce((total, item) => total + item.quantity, 0);
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
+        //gets the stored login token 
         const token = sessionStorage.getItem("token");
+
+        //sends to backend using bearer token to prove you're logged in 
         const res = await fetch("http://127.0.0.1:3000/cart", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -23,8 +31,10 @@ const Cart = () => {
 
         if (!res.ok) throw new Error("Failed to fetch cart");
 
+        //converts the server response to JSON and puts it inthe cart 
         const data = await res.json();
         setCart(data);
+
       } catch (error) {
         console.error("Error fetching cart:", error);
         setCart([]);
@@ -36,12 +46,18 @@ const Cart = () => {
     fetchCart();
   }, []);
 
+  //delta -> the change in quantity ( +1 or -1 )
   const updateQuantity = async (mealId, delta) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.meal.id === mealId
+
+    //updates the cart state using a new vesion of the cart 
+    setCart((prevCart) => //gets the previous cart state to be modified 
+      prevCart.map((item) => //loops over every item in the cart to create a new cart array
+        item.meal.id === mealId //check if the current cart item's meal id is the same as the one we want to update
+        //if so, copy all the existing properties of the current item  
+        //increase or decrease the quantity by delta (+1 or -1)
+        //math.max makes sure the quantity never goes below 1 
           ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
+          : item //else, return an unchanged item 
       )
     );
 
@@ -60,8 +76,11 @@ const Cart = () => {
     }
   };
 
+  //whenever the user pressed Proceed to Checkout
   const handleCheckout = async () => {
     try {
+      //send the whole cart to the backend for processing 
+      //uses the token to prove we are the one logged in 
       const token = sessionStorage.getItem("token");
       const res = await fetch("http://127.0.0.1:3000/checkout", {
         method: "POST",
@@ -79,33 +98,38 @@ const Cart = () => {
   
       alert(responseData); 
       setCart([]);  //clears the cart after checking out 
+
     } catch (err) {
       alert("Checkout failed: " + err.message); 
       console.error(err);
     }
-  }; 
+  };  
 
+  //delete an item from the cart 
   const deleteFromCart = async (mealId) => {
     try {
+      //sends an http delete request to the backend 
       const token = sessionStorage.getItem("token");
       const res = await fetch(`http://127.0.0.1:3000/cart/${mealId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, //used to identify the user 
         },
       });
   
       if (!res.ok) throw new Error("Failed to delete item from cart");
   
+      //update the cart state by removing the item with the matching mealid
       setCart((prevCart) => prevCart.filter(item => item.meal.id !== mealId));
+      
     } catch (err) {
       console.error("Delete failed:", err);
     }
   };
-
+  
   return (
     <>
-      {/* Navbar */}
+      {/* the navbar */}
       <header className="header">
         <nav className="navbar">
           <div className="logo-container">
@@ -130,7 +154,7 @@ const Cart = () => {
         </nav>
       </header>
 
-      {/* Cart Content */}
+      {/* content inside th cart */}
       <div className="cart-container">
         <h2 className="section-title">Your Cart</h2>
 
@@ -177,4 +201,3 @@ const Cart = () => {
 };
 
 export default Cart;
-
