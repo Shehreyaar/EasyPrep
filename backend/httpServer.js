@@ -221,6 +221,7 @@ app.post('/checkout',verifyToken,async function (req, res) {
     try{
       // Calculate the total price of the cart
       let total = 0;
+      let itemCount = 0;
       const detailedItems = [];
 
       for (let item of clientCart) {
@@ -229,11 +230,13 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
       if (!mealDoc.exists) continue;
 
-      const meal = mealDoc.data();
-      const price = meal.price || 0;
+      const meal = mealDoc.data();      
       const quantity = item.quantity;
+      const price = meal.price || 0;
 
+      //total += price * quantity;
       total += price * quantity;
+      itemCount += quantity;
 
       detailedItems.push({
         mealId: item.meal.id,
@@ -243,13 +246,46 @@ app.post('/checkout',verifyToken,async function (req, res) {
       });
     }
 
+    // Apply discount logic - cumulative...
+    let discount = 0;
+    const discountDetails = [];
+
+    // Offer 1: Buy 3 get 1 free
+    if (itemCount >= 4) {
+      const freeItems = Math.floor(itemCount / 4);
+      const avgPrice = total / itemCount;
+      const offerDiscount = freeItems * avgPrice;
+      discount += offerDiscount;
+      discountDetails.push("Buy 3 Get 1 Free");
+    }
+
+    // Offer 2: 30% off if 10+ boxes
+    if (itemCount >= 10) {
+      const offerDiscount = total * 0.30;
+      discount += offerDiscount;
+      discountDetails.push("30% off on 10+ boxes");
+    }
+
+    // Offer 3: $15 off if total >= $50
+    if (total >= 50) {
+      discount += 15;
+      discountDetails.push("$15 off on orders above $50");
+    }
+
+    // Offer 4: $10 off if 5+ boxes
+    if (itemCount >= 5) {
+      discount += 10;
+      discountDetails.push("$10 off on 5+ boxes");
+    }
+
+    const finalAmount = total - discount;
+
     // verify amount in wallet
     const userRef = admin.firestore().collection("users").doc(uid);
     const userSnap = await userRef.get();
-    const wallet = userSnap.data().wallet || 1000;
-  
+    const wallet = userSnap.data().wallet || 1000;  
 
-    if (wallet < total) {
+    if (wallet < finalAmount) {
       return res.status(403).send('Insufficient funds!');
     }
 
@@ -257,7 +293,10 @@ app.post('/checkout',verifyToken,async function (req, res) {
     await admin.firestore().collection("orders").add({
       userId: uid,
       items: detailedItems,
-      totalAmount: total,
+      totalAmount: total.toFixed(2),      
+      discount: discount.toFixed(2),
+      finalAmount: finalAmount.toFixed(2),
+      discountsApplied: discountDetails,
       status: "Pending",
       orderDate: new Date().toISOString()
 
@@ -265,9 +304,18 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
     // Clean cart, update amount wallet
     await admin.firestore().collection("carts").doc(uid).set({ items: [] });
-    await userRef.update({ wallet: wallet - total });
+    await userRef.update({ wallet: wallet - finalAmount });
 
-    res.status(200).send(`Checkout successful. Remaining balance: $${(wallet - total).toFixed(2)}`);
+    //res.status(200).send(`Checkout successful. Remaining balance: $${(wallet - finalAmount).toFixed(2)}`);
+    res.status(200).json({
+      message: "Checkout successful",
+      totalAmount: total,
+      discount,
+      finalAmount,
+      remainingBalance: wallet - finalAmount,
+      discountsApplied: discountDetails,
+    });
+
   } catch (err) {
     console.error("Checkout error:", err);
     res.status(500).send("Server error during checkout.");
