@@ -85,6 +85,24 @@ const Cart = () => {
     }
   }; 
 
+  const deleteFromCart = async (mealId) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await fetch(`http://127.0.0.1:3000/cart/${mealId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete item from cart");
+  
+      setCart((prevCart) => prevCart.filter(item => item.meal.id !== mealId));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
   return (
     <>
       {/* Navbar */}
@@ -131,6 +149,9 @@ const Cart = () => {
                   <span className="quantity">{item.quantity}</span>
                   <button onClick={() => updateQuantity(item.meal.id, 1)}>+</button>
                 </div>
+                <button className="delete-btn" onClick={() => deleteFromCart(item.meal.id)}>
+                  Remove
+                </button>
               </div>
             </div>
           ))

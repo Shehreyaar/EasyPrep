@@ -6,6 +6,7 @@ function Search() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
   const [meals, setMeals] = useState([]);
+  const [selectedMeal, setSelectedMeal] = useState(null);
 
   // fetch meals from Firebase when the component loads
   useEffect(() => {
@@ -14,14 +15,14 @@ function Search() {
       //const mealData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       try{
         const token = sessionStorage.getItem("token");
-        console.log("🔥 Token enviado:", token);
+        console.log("Token sent:", token);
         const response = await fetch("http://localhost:3000/meals", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await response.json();
-        setMeals(data); // this line stays the same
+        //setMeals(data); // this line stays the same
 
 
         // verify if it's array
@@ -46,6 +47,30 @@ function Search() {
     (category === "all" || meal.categories.includes(category)) &&
     meal.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddToCart = async () => {
+    if (!selectedMeal) return;
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await fetch("http://127.0.0.1:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          mealId: selectedMeal.id,
+          quantity: 1,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add to cart");
+      alert(`${selectedMeal.name} added to cart!`);
+      setSelectedMeal(null);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  };
 
   return (
     <>
@@ -110,15 +135,51 @@ function Search() {
 
         <div className="meals-grid">
           {filteredMeals.map((meal) => (
-            <div className="meal-card" key={meal.id} data-category={meal.categories.join(", ")}> 
+            <div className="meal-card" key={meal.id} data-category={meal.categories.join(", ")} onClick={() => setSelectedMeal(meal)}> 
               <img src={meal.imageUrl} alt={meal.name} className="meal-image" />
               <h3>{meal.name}</h3>
               <p>{meal.description}</p>
             </div>
           ))}
         </div>
-
       </section>
+
+      {/* MODAL */}
+      {selectedMeal && (
+        <div id="meal-details" className="meal-details two-column-layout">
+          <button className="close-btn" onClick={() => setSelectedMeal(null)}>X</button>
+          <div className="image-section">
+            <img src={selectedMeal.imageUrl || "/Images/default-meal.jpg"} alt={selectedMeal.name} />
+          </div>
+          <div className="info-section">
+            <h2>{selectedMeal.name}</h2>
+            <p className="spaced-block">{selectedMeal.description}</p>
+
+            <div className="spaced-block">
+              <h3>Ingredients</h3>
+              <p>{selectedMeal.ingredients?.length > 0
+                ? selectedMeal.ingredients.join(", ")
+                : "No ingredients listed."}</p>
+            </div>
+
+            <div className="spaced-block">
+              <h3>Nutrition Facts</h3>
+              <p>
+                Calories: {selectedMeal.calories || "N/A"} | Protein: {selectedMeal.protein || "N/A"} |
+                Carbs: {selectedMeal.carbs || "N/A"} | Fat: {selectedMeal.fat || "N/A"}
+              </p>
+            </div>
+
+            <p className="price-display spaced-block">
+              <strong>Price:</strong> <span>${selectedMeal.price ? selectedMeal.price.toFixed(2) : "N/A"}</span>
+            </p>
+
+            <button onClick={handleAddToCart} className="add-to-cart-btn">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      )}
 
       <footer className="footer">
         <div className="footer-container">

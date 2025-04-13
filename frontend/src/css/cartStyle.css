@@ -215,3 +215,20 @@ body {
 .checkout-btn:hover {
     background: #218838;
 }
+
+
+.delete-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #c72b28;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-btn:hover {
+    background-color: #a0201d;
+  }
