@@ -9,11 +9,6 @@ function MealDetail({ addToCart, cartLength }) {
 
   useEffect(() => {
     const fetchMeals = async () => {
-      //const querySnapshot = await getDocs(collection(db, "meals"));
-      //const mealsData = {};
-      //querySnapshot.forEach((doc) => {
-        //mealsData[doc.id] = { id: doc.id, ...doc.data() };
-      //});
       try {
         const token = sessionStorage.getItem("token");
         const res = await fetch("http://127.0.0.1:3000/meals", {
@@ -26,7 +21,7 @@ function MealDetail({ addToCart, cartLength }) {
         data.forEach((meal) => {
           mealsData[meal.id] = meal;
         });
-        setMeals(mealsData); // this line stays the same
+        setMeals(mealsData);
       } catch (error) {
         console.error("Failed to load meals:", error);
       }
@@ -50,7 +45,7 @@ function MealDetail({ addToCart, cartLength }) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // <-- this is important
+        Authorization: `Bearer ${token}`, 
       },
       body: JSON.stringify({
         mealId: selectedMeal.id,
@@ -64,7 +59,7 @@ function MealDetail({ addToCart, cartLength }) {
 
     alert(`${selectedMeal.name} added to cart!`);
     setSelectedMeal(null);
-    navigate("/cart");
+    //navigate("/cart"); no need to go to the cart page everytime a meal gets added to the cart
   } catch (error) {
     console.error("Error adding to cart:", error);
   }
