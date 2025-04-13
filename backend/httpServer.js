@@ -18,7 +18,9 @@ const firebaseAuth = admin.auth();
 // =============================================================
 // Auth: Register, Login, Forgot Password
 // =============================================================
+
 // REGISTER
+//grabs the user input to create a new user 
 app.post('/register', async (req, res) => {
     const { email, password, firstName, lastName, phoneNumber, address } = req.body;
   
@@ -30,7 +32,8 @@ app.post('/register', async (req, res) => {
       });
   
       console.log("User created:", user.uid);
-      // Save data firebase
+
+      //saves the data in the firebase m
       await admin.firestore().collection('users').doc(user.uid).set({
         firstName,
         lastName,
@@ -39,12 +42,13 @@ app.post('/register', async (req, res) => {
         email,
       });
 
+      //print message when successfully savin a user in the firebase 
       console.log("User saved to Firestore");
   
       res.status(201).json({ message: 'User created', uid: user.uid });
     } catch (error) {
       res.status(400).json({ error: error.message });
-    }
+    } 
   });
 
 //LOGIN
@@ -55,7 +59,7 @@ app.post('/register', async (req, res) => {
       // Use Firebase REST API to generate token
       const apiKey = "AIzaSyCRuI7nuTJreYg5EyD7TMhLX6W3nP0-tJ8";
       const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
-        method: 'POST',
+        method: 'POST', //make a POST request to the firebase with the email and password
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, returnSecureToken: true }),
       });
@@ -196,9 +200,9 @@ app.post("/update-address", verifyToken, async (req, res) => {
 //  Cart (mock local) - ADD | VIEW | DELETE | CHECKOUT
 // ============================================
 
-let cart = [];
+let cart = []; 
 let wallet = 1000.00; //default wallet balance 
-const mealList = []
+const mealList = [] //stores available meals 
 
 function getIdx (mealId) {
     for (let i = 0; i < mealList.length; i++) {
@@ -214,65 +218,73 @@ app.post('/checkout',verifyToken,async function (req, res) {
     const uid = req.user.uid;
     const clientCart = req.body.cart;
 
+    //error message if the cart is empty
     if (!clientCart || clientCart.length === 0) {
       return res.status(400).send('Cart is empty!');
     }
 
     try{
-      // Calculate the total price of the cart
+      //total price of all items 
       let total = 0;
+
+      //count of total meals 
       let itemCount = 0;
       const detailedItems = [];
 
       for (let item of clientCart) {
+        //loop thru each item to get meal from firebase using the meal's ID
         const mealRef = admin.firestore().collection("meals").doc(item.meal.id);
-      const mealDoc = await mealRef.get();
+        const mealDoc = await mealRef.get();
 
-      if (!mealDoc.exists) continue;
+        //if the meal doesnt exist, skip it
+        if (!mealDoc.exists) continue;
 
-      const meal = mealDoc.data();      
-      const quantity = item.quantity;
-      const price = meal.price || 0;
+        //gets the meal's data
+        const meal = mealDoc.data();      
+        const quantity = item.quantity;
+        const price = meal.price || 0;
 
-      //total += price * quantity;
-      total += price * quantity;
-      itemCount += quantity;
+        //adds the meal's total to the cart's total price 
+        total += price * quantity;
 
-      detailedItems.push({
-        mealId: item.meal.id,
-        name: meal.name,
-        quantity,
-        price
-      });
+        //add quantity to the total item count 
+        itemCount += quantity;
+
+        detailedItems.push({
+          mealId: item.meal.id,
+          name: meal.name,
+          quantity,
+          price
+        });
     }
 
-    // Apply discount logic - cumulative...
+    //start tracking the total discount 
     let discount = 0;
     const discountDetails = [];
 
-    // Offer 1: Buy 3 get 1 free
+    //offer 1: buy 3 then get 1 free 
     if (itemCount >= 4) {
-      const freeItems = Math.floor(itemCount / 4);
-      const avgPrice = total / itemCount;
+      const freeItems = Math.floor(itemCount / 4); //calculate how many free items you get 
+      const avgPrice = total / itemCount; 
       const offerDiscount = freeItems * avgPrice;
       discount += offerDiscount;
       discountDetails.push("Buy 3 Get 1 Free");
     }
 
-    // Offer 2: 30% off if 10+ boxes
+    //offer 2: 30% off if you have 10 or more boxes 
     if (itemCount >= 10) {
       const offerDiscount = total * 0.30;
       discount += offerDiscount;
       discountDetails.push("30% off on 10+ boxes");
     }
 
-    // Offer 3: $15 off if total >= $50
+    //offer 3: $15 off if total is 50$ or more 
     if (total >= 50) {
       discount += 15;
       discountDetails.push("$15 off on orders above $50");
     }
 
-    // Offer 4: $10 off if 5+ boxes
+    //offer 4: $10 off if you have 5 or more boxes
     if (itemCount >= 5) {
       discount += 10;
       discountDetails.push("$10 off on 5+ boxes");
@@ -281,10 +293,6 @@ app.post('/checkout',verifyToken,async function (req, res) {
     const finalAmount = total - discount;
 
     // verify amount in wallet
-    const userRef = admin.firestore().collection("users").doc(uid);
-    const userSnap = await userRef.get();
-    const wallet = userSnap.data().wallet || 1000;  
-
     if (wallet < finalAmount) {
       return res.status(403).send('Insufficient funds!');
     }
@@ -302,11 +310,10 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
     });
 
-    // Clean cart, update amount wallet
+    //clear the cart and update the amount of the wallet 
     await admin.firestore().collection("carts").doc(uid).set({ items: [] });
     await userRef.update({ wallet: wallet - finalAmount });
 
-    //res.status(200).send(`Checkout successful. Remaining balance: $${(wallet - finalAmount).toFixed(2)}`);
     res.status(200).json({
       message: "Checkout successful",
       totalAmount: total,
@@ -325,31 +332,38 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
 
 //View cart
-// Assuming you're using Firestore or similar database:
 app.post("/cart", verifyToken, async (req, res) => {
+  //getting the meal id and the quantity
   const { mealId, quantity } = req.body;
   const uid = req.user.uid;
 
   try {
+    //access the meals collection in the firebase 
     const mealRef = admin.firestore().collection("meals").doc(mealId);
     const mealDoc = await mealRef.get();
 
+    //error message if the meal is not found
     if (!mealDoc.exists) return res.status(404).send("Meal not found");
 
     const mealData = mealDoc.data();
 
+    //access the carts collection 
+    //get the existing cart for the user
+    //if nonexistent, empty cart 
     const cartRef = admin.firestore().collection("carts").doc(uid);
     const userCart = (await cartRef.get()).data() || { items: [] };
 
+    //checks if the meal is already in the cart 
     const existingItemIndex = userCart.items.findIndex(item => item.mealId === mealId);
     if (existingItemIndex >= 0) {
-      userCart.items[existingItemIndex].quantity += quantity;
+      userCart.items[existingItemIndex].quantity += quantity; 
     } else {
-      userCart.items.push({ mealId, quantity });
+      userCart.items.push({ mealId, quantity }); //add meal to cart if not already in it
     }
 
     await cartRef.set(userCart);
 
+    //success message if meal is added successfully to cart 
     res.status(200).json({ message: "Meal added to cart", cart: userCart });
   } catch (error) {
     console.error("Error adding to cart:", error);
@@ -363,8 +377,12 @@ app.get("/cart", verifyToken, async (req, res) => {
     const cartDoc = await admin.firestore().collection("carts").doc(uid).get();
     const cartData = cartDoc.exists ? cartDoc.data().items : [];
 
-    const detailedItems = await Promise.all(
+    //we want to look up each meal in the database and get the data
+    const detailedItems = await Promise.all( //runs the requests at the same time and wait until every one of them finishes 
       cartData.map(async ({ mealId, quantity }) => {
+
+        //access the meals collection in the firebase 
+        //find document that matches the meal id and get its data 
         const mealDoc = await admin.firestore().collection("meals").doc(mealId).get();
         return {
           meal: { id: mealDoc.id, ...mealDoc.data() },
