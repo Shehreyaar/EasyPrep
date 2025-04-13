@@ -3,25 +3,34 @@ import { useNavigate } from "react-router-dom";
 import "../css/stylesMealDetail.css";
 
 function MealDetail({ addToCart, cartLength }) {
+
+  //meals holds the meal data 
+  //setMeals is the function to update the data 
   const [meals, setMeals] = useState({});
+
+  //selectedMeal holds the meal that the user has clicked 
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
+    //load all the meals from the backend 
     const fetchMeals = async () => {
       try {
         const token = sessionStorage.getItem("token");
         const res = await fetch("http://127.0.0.1:3000/meals", {
+          //make a requeast in the backend to get the meals 
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, 
           },
         }); 
+        //converts response into json 
         const data = await res.json();
         const mealsData = {};
+
+        //convert meal list to map whete the key is the mealID
         data.forEach((meal) => {
           mealsData[meal.id] = meal;
         });
-        setMeals(mealsData);
+        setMeals(mealsData); 
       } catch (error) {
         console.error("Failed to load meals:", error);
       }
@@ -30,61 +39,69 @@ function MealDetail({ addToCart, cartLength }) {
     fetchMeals();
   }, []);
 
-  const handleShowDetails = (mealKey) => {
+  //
+  const handleSelectedMeal = (mealKey) => {
     setSelectedMeal({ ...meals[mealKey], key: mealKey, quantity: 1 });
   };
 
   const handleClose = () => setSelectedMeal(null);
 
-  const handleAddToCart = async() => {
+  const handleAddToCart = async () => {
+    //makes sure a meal is selected before trying to add it to the cart 
     if (!selectedMeal) return;
+  
+    try {
+      const token = sessionStorage.getItem("token");
 
-      try {
-    const token = sessionStorage.getItem("token");
-    const res = await fetch("http://127.0.0.1:3000/cart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, 
-      },
-      body: JSON.stringify({
-        mealId: selectedMeal.id,
-        quantity: selectedMeal.quantity || 1,
-      }),
-    });
+      //makes a post request to the /cart endpoint 
+      const res = await fetch("http://127.0.0.1:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, //confirms authorization to perfrm action 
+        },
+        //converts the data to json using JSON.stringify 
+        body: JSON.stringify({
+          mealId: selectedMeal.id,
+          quantity: selectedMeal.quantity || 1,
+        }),
+      });
+  
+      //error message if response is not okay 
+      if (!res.ok) {
+        throw new Error("Failed to add to cart");
+      }
+  
+      //show message with chosen meal 
+      alert(`${selectedMeal.name} added to cart!`);
 
-    if (!res.ok) {
-      throw new Error("Failed to add to cart");
+      //clears the selected meal 
+
+      setSelectedMeal(null);
+      
+      //navigate("/cart"); no need to navigate to the cart page everytime a meal gets added 
+    } catch (error) {
+      console.error("Error adding to cart:", error);
     }
-
-    alert(`${selectedMeal.name} added to cart!`);
-    setSelectedMeal(null);
-    //navigate("/cart"); no need to go to the cart page everytime a meal gets added to the cart
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-  }
-};
-
+  };
+  
   return (
     <>
       <header className="header">
         <nav className="navbar">
           <div className="logo-container">
-            <a href="/home-logged-in">
-              <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
-            </a>
+            <img src="/Images/logoEasyPrep.svg" alt="EasyPrep" className="logo" />
           </div>
           <div className="nameApp">
-          <a href="/home-logged-in">
             <img src="/Images/nameApp.png" alt="NameApp" className="name" />
-            </a>
           </div>
           <ul className="nav-links">
+            <li><a href="/home-logged-in">Home</a></li>
             <li><a href="/search">Search Menu</a></li>
             <li><a href="/meal-detail">Nutrition Facts</a></li>
             <li><a href="/special-offers">Special Offers</a></li>
             <li><a href="/track-order">Track Order</a></li>
-            <li><a href="/cart">My Cart ({cartLength})</a></li>
+            <li><a href="/cart">MyCart ({cartLength})</a></li>
             <li><a href="/">Logout</a></li>
           </ul>
           <button className="login-btn" onClick={() => window.location.href = '/profile'}>
@@ -98,7 +115,7 @@ function MealDetail({ addToCart, cartLength }) {
         <h2>Select a Meal to View Nutrition Facts</h2>
         <div className="meals-grid">
           {Object.entries(meals).map(([key, meal]) => (
-            <div key={key} className="meal-card" onClick={() => handleShowDetails(key)}>
+            <div key={key} className="meal-card" onClick={() => handleSelectedMeal(key)}>
               <img src={meal.imageUrl || "/Images/default-meal.jpg"} alt={meal.name} />
               <h3>{meal.name || "Meal Name"}</h3>
               <p>{meal.description || "No description available."}</p>
