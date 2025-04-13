@@ -96,8 +96,11 @@ const Cart = () => {
       
       if (!res.ok) {
         throw new Error(responseData.error || "Checkout failed");
+        throw new Error(responseData.error || "Checkout failed");
       }
   
+      //alert(responseData); 
+      setCheckoutInfo(responseData);
       //alert(responseData); 
       setCheckoutInfo(responseData);
       setCart([]);  //clears the cart after checking out 
@@ -160,9 +163,10 @@ const Cart = () => {
       {/* content inside th cart */}
       <div className="cart-container">
         <h2 className="section-title">Your Cart</h2>
-
+  
         {loading ? (
           <p>Loading cart...</p>
+        ) : cart.length === 0 && !checkoutInfo ? (
         ) : cart.length === 0 && !checkoutInfo ? (
           <p>Your cart is empty.</p>
         ) : (
@@ -183,7 +187,7 @@ const Cart = () => {
             </div>
           ))
         )}
-
+  
         {!loading && cart.length > 0 && (
           <>
             <button
@@ -214,6 +218,5 @@ const Cart = () => {
       </div>
     </>
   );
-};
-
+}
 export default Cart;

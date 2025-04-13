@@ -14,7 +14,7 @@ function SpecialOffers() {
       desc: "",
     },
     {
-      title: "Recieve a 30% discount if you purchase 10 boxes or more!",
+      title: "Receive a 30% discount if you purchase 10 boxes or more!",
       desc: "",
     },
     {
@@ -108,6 +108,31 @@ function SpecialOffers() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleAddToCart = async (meal) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await fetch("http://127.0.0.1:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          mealId: meal.id,
+          quantity: 1,
+        }),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add meal to cart");
+  
+      alert(`${meal.name} added to cart!`);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      alert("Error adding meal to cart.");
+    }
+  }; 
+
+
   return (
     <>
       {/* Header */}
@@ -152,7 +177,7 @@ function SpecialOffers() {
               <p style={{ fontWeight: "bold", color: "#C72B28", marginTop: "10px" }}>
                 Time Left: {formatTime(timeLeft)}
               </p>
-              <button name="addToCart" className="add-to-cart-btn" onClick={() => (window.location.href = "/cart")} > Add to Cart </button>
+              <button name="addToCart" className="add-to-cart-btn" onClick={() => handleAddToCart(meal)} > Add to Cart </button>
             </div>
           ))}
         </div>
