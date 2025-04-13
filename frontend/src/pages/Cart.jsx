@@ -7,6 +7,7 @@ const Cart = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [walletBalance, setWalletBalance] = useState(null);
+  const [checkoutInfo, setCheckoutInfo] = useState(null);
   // const navigate = useNavigate(); // Uncomment if using react-router
 
   const cartLength = cart.reduce((total, item) => total + item.quantity, 0);
@@ -72,12 +73,15 @@ const Cart = () => {
         body: JSON.stringify({ cart }),  
       });
   
-      const responseData = await res.text();
+      //const responseData = await res.text();
+      const responseData = await res.json();
+
       if (!res.ok) {
-        throw new Error(responseData);
+        throw new Error(responseData.error || "Checkout failed");
       }
   
-      alert(responseData); 
+      //alert(responseData); 
+      setCheckoutInfo(responseData);
       setCart([]);  //clears the cart after checking out 
     } catch (err) {
       alert("Checkout failed: " + err.message); 
@@ -129,14 +133,14 @@ const Cart = () => {
           </button>
         </nav>
       </header>
-
+  
       {/* Cart Content */}
       <div className="cart-container">
         <h2 className="section-title">Your Cart</h2>
-
+  
         {loading ? (
           <p>Loading cart...</p>
-        ) : cart.length === 0 ? (
+        ) : cart.length === 0 && !checkoutInfo ? (
           <p>Your cart is empty.</p>
         ) : (
           cart.map((item) => (
@@ -156,25 +160,35 @@ const Cart = () => {
             </div>
           ))
         )}
-
+  
         {!loading && cart.length > 0 && (
-          <>
-            <button
-              className="checkout-btn"
-              onClick={handleCheckout}
-              disabled={cart.length === 0}
-            >
-              Proceed to Checkout
-            </button>
-            {walletBalance !== null && (
-              <p className="wallet-balance">Remaining Balance: ${walletBalance.toFixed(2)}</p>
+          <button
+            className="checkout-btn"
+            onClick={handleCheckout}
+            disabled={cart.length === 0}
+          >
+            Proceed to Checkout
+          </button>
+        )}
+  
+        {checkoutInfo && (
+          <div className="checkout-result">
+            {checkoutInfo.error ? (
+              <p style={{ color: "red" }}>{checkoutInfo.error}</p>
+            ) : (
+              <>
+                <p><strong>Total:</strong> ${checkoutInfo.totalAmount}</p>
+                <p><strong>Discount:</strong> -${checkoutInfo.discount}</p>
+                <p><strong>Final Price:</strong> ${checkoutInfo.finalAmount}</p>
+                <p><strong>Remaining Balance:</strong> ${checkoutInfo.remainingBalance}</p>
+                <p><strong>Offers Applied:</strong> {checkoutInfo.discountsApplied.join(", ")}</p>
+              </>
             )}
-          </>
+          </div>
         )}
       </div>
     </>
   );
-};
-
+}
 export default Cart;
 
