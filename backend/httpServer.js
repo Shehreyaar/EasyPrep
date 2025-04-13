@@ -197,9 +197,9 @@ app.post("/update-address", verifyToken, async (req, res) => {
 
 
 // ============================================
-//  Cart (mock local) - ADD | VIEW | DELETE | CHECKOUT
+//  Cart (mock local) 
 // ============================================
-
+/*
 let cart = []; 
 let wallet = 1000.00; //default wallet balance 
 const mealList = [] //stores available meals 
@@ -211,7 +211,11 @@ function getIdx (mealId) {
         }
     }
     return null;
-}
+}*/
+
+// ============================================
+//  Cart - ADD | VIEW | DELETE | CHECKOUT
+// ============================================
 
 //Checkout 
 app.post('/checkout',verifyToken,async function (req, res) {
@@ -220,7 +224,7 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
     //error message if the cart is empty
     if (!clientCart || clientCart.length === 0) {
-      return res.status(400).send('Cart is empty!');
+      return res.status(400).send('Cart is empty!');      
     }
 
     try{
@@ -258,6 +262,10 @@ app.post('/checkout',verifyToken,async function (req, res) {
         });
     }
 
+    const userRef = admin.firestore().collection("users").doc(uid);
+    const userSnap = await userRef.get();
+    const wallet = userSnap.data().wallet || 1000;
+
     //start tracking the total discount 
     let discount = 0;
     const discountDetails = [];
@@ -294,7 +302,8 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
     // verify amount in wallet
     if (wallet < finalAmount) {
-      return res.status(403).send('Insufficient funds!');
+      //return res.status(403).send('Insufficient funds!');
+      res.status(403).json({ error: 'Insufficient funds!' });
     }
 
     // Save order in Firestore
@@ -325,7 +334,8 @@ app.post('/checkout',verifyToken,async function (req, res) {
 
   } catch (err) {
     console.error("Checkout error:", err);
-    res.status(500).send("Server error during checkout.");
+    //res.status(500).send("Server error during checkout.");
+    res.status(500).json({ error: 'Server error during checkout.' });
   }
 });
 

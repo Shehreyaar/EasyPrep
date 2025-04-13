@@ -95,8 +95,7 @@ const Cart = () => {
       const responseData = await res.json();
       
       if (!res.ok) {
-        throw new Error(responseData.error || "Checkout failed");
-        throw new Error(responseData.error || "Checkout failed");
+        throw new Error(responseData.error || "Checkout failed");        
       }
   
       //alert(responseData); 
