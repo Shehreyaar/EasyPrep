@@ -407,20 +407,46 @@ app.get("/cart", verifyToken, async (req, res) => {
   }
 });
 
-
 //Delete meal from cart 
-app.delete('/cart/:mealId',verifyToken, function (req, res) {
-    const mealId = parseInt(req.params.mealId);
-    const idx = cart.findIndex(item => item.meal.id === mealId);
+app.delete('/cart/:mealId', verifyToken, async (req, res) => {
+  //gvet the uid of the user from the token 
+  const uid = req.user.uid;
 
-    if (idx === null) { //meal not found
-        return res.status(404).send('Meal not found in cart');
+  //get the mealId from the url 
+  const mealId = req.params.mealId;
+
+  try {
+    //ref to the users cart doc in the firestore
+    const cartRef = admin.firestore().collection("carts").doc(uid);
+
+    //fetch the cart doc from firestore
+    const cartSnap = await cartRef.get();
+
+    //if cart does not exist, show error message 
+    if (!cartSnap.exists) {
+      return res.status(404).json({ error: "Cart not found" });
     }
 
-    cart.splice(idx, 1);
-    res.status(204).send();
-});
+    //get the current list of items in the cart, empty array if nonexistent 
+    let items = cartSnap.data().items || [];
 
+    //create new array of items that excludes the meal we're trying to delete 
+    const newItems = items.filter(item => item.mealId !== mealId);
+
+    //if nothing is removed -> item was not found 
+    if (newItems.length === items.length) {
+      return res.status(404).json({ error: "Meal not found in cart" });
+    }
+
+    //save the updated cart to the firestore 
+    await cartRef.set({ items: newItems });
+
+    res.status(200).json({ message: "Meal removed from cart" });
+  } catch (error) {
+    console.error("Error deleting meal from cart:", error);
+    res.status(500).json({ error: "Failed to delete meal from cart" });
+  }
+});
 
 // ============================================
 //  Meals - GET ALL | GET BY ID
