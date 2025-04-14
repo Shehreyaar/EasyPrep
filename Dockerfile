@@ -1,27 +1,27 @@
+# stage: base
 FROM node:22.13.0 AS base
-WORKDIR /easyprep-main
+WORKDIR /app
 
+# stage: frontend-base
 FROM base AS frontend-base
-COPY frontend/package.json .
-COPY frontend/package-lock.json .
-RUN npm install --omit-dev
-COPY frontend/vite.config.js .
-COPY frontend/index.html .
-COPY frontend/eslint.config.js .
-COPY frontend/public/Images ./public/Images
-COPY frontend/src ./src
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm install --omit dev
+COPY frontend/ . 
 
-FROM frontend-base AS frontend-build
-RUN npm run build
+# stage: frontend-final
+FROM frontend-base AS frontend-final
+EXPOSE 5173
+CMD ["npm", "run", "dev"]
 
-FROM base AS final
-ENV NODE_ENV=production
-COPY backend/package.json .
-COPY backend/package-lock.json .
-RUN npm install --omit-dev
-COPY backend/httpServer.js ./src/
-COPY backend/firebaseAuthMiddleware.js ./src/
-COPY --from=frontend-build /easyprep-main/dist ./src/static
+# stage: backend-base
+FROM base AS backend-base
+WORKDIR /app/backend
+COPY backend/package.json backend/package-lock.json ./
+RUN npm install --omit dev
+COPY backend/ .
+
+# stage: backend-final
+FROM backend-base AS backend-final
 EXPOSE 3000
-
-CMD [ "node", "src/httpServer.js" ]
+CMD ["npm", "start"]
