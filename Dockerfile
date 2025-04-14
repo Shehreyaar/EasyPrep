@@ -6,7 +6,7 @@ WORKDIR /app
 FROM base AS frontend-base
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm install --omit dev
+RUN npm install
 COPY frontend/ . 
 
 # stage: frontend-final
