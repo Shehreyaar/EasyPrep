@@ -1,16 +1,17 @@
-name: easy-prep-main
-services: 
-  web:
-    build: 
-      context: ./
-      target: final
-    container_name: web
-    develop:
-      watch:
-        - path: ./backend/package.json
-          action: rebuild
-        - path: ./backend/httpServer.js
-          target: /app/src/httpServer.js
-          action: sync
+services:
+  frontend:
+    build:
+      context: .
+      target: frontend-final
+    container_name: easy-prep-frontend
     ports:
-      - '3000:3000'
+      - "5173:5173"
+
+  backend:
+    build:
+      context: .
+      target: backend-final
+    container_name: easy-prep-backend
+    ports:
+      - "3000:3000"
+      
