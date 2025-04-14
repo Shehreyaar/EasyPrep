@@ -458,6 +458,6 @@ app.get('/meals/:id', verifyToken,  function (req, res,) {
 // Start server
 // =============================================================
 
-const server = app.listen(3000, '127.0.0.1', function() {
-    console.log( 'HTTP server listening on 127.0.0.1:3000' );
+const server = app.listen( 3000, function () {
+  console.log( 'HTTP app server listening on 127.0.0.1:3000' );
 });
