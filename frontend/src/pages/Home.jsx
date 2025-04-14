@@ -69,13 +69,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Menu categories */}
-      <section className="menu-categories">
-        {["Vegan", "Vegetarian", "Family", "Thai", "Mexican", "Gluten-Free", "Low-Carb"].map(cat => (
-          <div key={cat} className="category" data-category={cat}>{cat}</div>
-        ))}
-      </section>
-
       {/* Menu scroll */}
       <section className="menu-scroll">
         <div className="menu-container">
